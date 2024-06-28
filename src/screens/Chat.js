@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import { View, Text, ScrollView } from "react-native";
+import Button from "../components/Button";
 import MessageBubble from "../components/MessageBubble";
 import MessageInput from "../components/MessageInput";
 import axios from '../utils/axios';
@@ -8,7 +9,7 @@ import Loading from "./Loading";
 import socket from '../services/SocketIO';
 import { useNotification } from "../NotificationProvider";
 
-const Chat = ({ route }) => {
+const Chat = ({ route, navigation }) => {
     const chatId = route.params.chatId;
     const [chat, setChat] = useState(null);
     const [me, setMe] = useState(null);
@@ -16,6 +17,25 @@ const Chat = ({ route }) => {
     const [messages, setMessages] = useState([]);
 
     const { showNotification } = useNotification();
+
+    useLayoutEffect(() => {
+        const getUserProfile = async () => {
+            const profileUserId = chat.users.find(u => u != me._id);
+            const profileUser = await axios.get('users/' + profileUserId);
+            navigation.setOptions({
+              headerRight: () => (
+                <Button 
+                onPress={() => navigation.navigate('UserProfile', { profileUser: profileUser.data })} 
+                styleText={{fontSize:14}} color='primary'>
+                    Ver Perfil
+                </Button>
+              ),
+            });
+        }
+        if (chat && me) {
+            getUserProfile();
+        }
+    }, [navigation, chat, me]);
 
     const handleMessageSubmit = async (text) => {
         const token = await Storage.get('auth_token');
@@ -51,16 +71,17 @@ const Chat = ({ route }) => {
             .catch(err => {
                 console.log(err)
             })
-        }
-        socket.on('newMessage', getNewMessage);
-        return () => {
-            socket.off('newMessage', getNewMessage);
         };
-    },[]);
+        if (me) {
+            socket.on('newMessage_' + me._id, getNewMessage);
+            return () => {
+                socket.off('newMessage_' + me._id, getNewMessage);
+            };
+        }
+    },[me]);
         
     const getUser = async () => {
         const getMe = await Storage.get('user');
-        console.log(getMe)
         setMe(JSON.parse(getMe));
     };
 

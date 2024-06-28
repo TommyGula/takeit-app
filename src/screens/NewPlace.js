@@ -236,9 +236,12 @@ const NewPlace = ({ navigation, route }) => {
                             </View>
                             <View style={{paddingVertical:20}}>
                                 {/* Map */}
-                                <MapView style={newPlaceStyles.map} region={region} provider={PROVIDER_GOOGLE}>
-                                    {region && <Marker coordinate={region} image={MeIcon}/>}
-                                </MapView>
+                                <View style={{position:'relative'}}>
+                                    <MapView style={newPlaceStyles.map} region={region} provider={PROVIDER_GOOGLE}>
+                                        {region && <Marker coordinate={region} image={MeIcon}/>}
+                                    </MapView>
+                                    <View style={styles.mapOverlay}></View> 
+                                </View>
                             </View>
                             {
                                 region ?

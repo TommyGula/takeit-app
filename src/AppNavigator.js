@@ -13,6 +13,7 @@ import NewDocument from './screens/NewDocument';
 import NewPlace from './screens/NewPlace';
 import LivePlace from './screens/LivePlace';
 import Login from './screens/Login';
+import Hello from './screens/Hello';
 
 // Navigatior
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -27,11 +28,15 @@ const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 const AppNavigator = () => {
-  const [isAuth, setIsAuth] = useState(false);
+  const [isAuth, setIsAuth] = useState(null);
 
   useEffect(() => {
     checkAuthentication();
   },[]);
+
+  useEffect(() => {
+    console.log('Is Auth changed ' + isAuth)
+  },[isAuth]);
   
   const checkAuthentication = async () => {
     const data = await AuthService.getUserAndTokenIfAuthenticated();
@@ -44,6 +49,9 @@ const AppNavigator = () => {
 
   return (
     <Stack.Navigator initialRouteName="Home" style={styles.app}>
+      <Stack.Screen name="Hello" options={{ title: 'Hello', headerShown: false }} >
+        {props => <Hello {...props} isAuth={isAuth} />}
+      </Stack.Screen>
       {
         isAuth ? 
         <>
@@ -53,9 +61,9 @@ const AppNavigator = () => {
           <Stack.Screen name="Chats" component={ChatList} options={{ title: 'Chats' }} />
           <Stack.Screen name="Settings" component={Profile} options={{ title: 'Mi Perfil' }} />
           <Stack.Screen name="UserProfile" component={Profile} options={({ route }) => ({ title: route.params.profileUser.firstName + ' ' + route.params.profileUser.lastName })} />
-          <Stack.Screen name="NewCar" component={NewCar} options={{ title: 'Nuevo Auto' }} />
+          <Stack.Screen name="NewCar" component={NewCar} options={({ route }) => ({ title: route.params && route.params.carId ? 'Editar Auto' : 'Nuevo Auto' })} />
           <Stack.Screen name="ViewCar" component={NewCar} options={({ route }) => ({ title: route.params.carName })} />
-          <Stack.Screen name="NewDocument" component={NewDocument} options={{ title: 'Nuevo Documento' }} />
+          <Stack.Screen name="NewDocument" component={NewDocument} options={({route}) => ({ title: route.params && route.params.docId && route.params.userId ? 'Ver Documento' : route.params && route.params.docId ? 'Editar Documento' : 'Nuevo Documento' })} />
           <Stack.Screen name="NewPlace" component={NewPlace} options={{ title: 'Iniciar Búsqueda' }} />
           <Stack.Screen name="LivePlace" component={LivePlace} options={{ title: 'Búsqueda', headerShown: false }} />
           <Stack.Screen name="Chat" component={Chat} options={({ route }) => ({ title: route.params.userName })} />

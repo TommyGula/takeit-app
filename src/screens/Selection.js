@@ -203,18 +203,20 @@ const Selection = ({ navigation, route }) => {
                                     <RadioButton.Group onValueChange={value => setMethod(value)} value={method}>
                                         {
                                             Object.keys(paymentMethods).map((type, i) => {
-                                                return (
-                                                    <View key={i} style={{marginBottom:0}}>
-                                                        <Dropdown index={i} startsOpen={type == initialState} childProps={(x) => {
-                                                            return(
-                                                                {
-                                                                    onPress:() => setMethod(x),
-                                                                    active:method == x
-                                                                }
-                                                            )
-                                                        }} Component={Payment} options={paymentMethods[type]} title={type.replace("_", " ").toLocaleUpperCase()}></Dropdown>
-                                                    </View>
-                                                )
+                                                if (type.replace("_", " ").toLocaleUpperCase() == 'EFECTIVO') {
+                                                    return (
+                                                        <View key={i} style={{marginBottom:0}}>
+                                                            <Dropdown index={i} startsOpen={type == initialState} childProps={(x) => {
+                                                                return(
+                                                                    {
+                                                                        onPress:() => setMethod(x),
+                                                                        active:method == x
+                                                                    }
+                                                                )
+                                                            }} Component={Payment} options={paymentMethods[type]} title={type.replace("_", " ").toLocaleUpperCase()}></Dropdown>
+                                                        </View>
+                                                    )
+                                                }
                                             })
                                         }
                                     </RadioButton.Group>

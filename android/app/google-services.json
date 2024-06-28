@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "946588535618",
+    "project_id": "busy-town",
+    "storage_bucket": "busy-town.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:946588535618:android:b34b1e779895c13ceed6db",
+        "android_client_info": {
+          "package_name": "com.busytownapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa6yZ6WzD94LZ9yVLzgnr8BjIxi1u38KU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

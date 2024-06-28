@@ -136,7 +136,6 @@ const Summary = ({ route, navigation }) => {
 
     // Add event listener for hardware back button press
     useEffect(() => {
-        console.log('Back handler?')
         BackHandler.addEventListener('hardwareBackPress', cancelEverything);
 
         // Clean up event listener when the component unmounts

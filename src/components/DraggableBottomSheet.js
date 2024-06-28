@@ -60,9 +60,9 @@ const DraggableBottomSheet = ({ children, open, selected, isStatic = false, maxH
 
   useEffect(() => {
     if (current !== selected || isStatic) {
-      springAnimation(open ? 'up' : 'down');
       setCurrent(selected);
-    }
+    };
+    springAnimation('semi');
   }, [open, selected, isStatic]);
 
   const springAnimation = (direction) => {
