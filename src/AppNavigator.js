@@ -48,7 +48,7 @@ const AppNavigator = () => {
   };
 
   return (
-    <Stack.Navigator initialRouteName="Home" style={styles.app}>
+    <Stack.Navigator initialRouteName="Hello" style={styles.app}>
       <Stack.Screen name="Hello" options={{ title: 'Hello', headerShown: false }} >
         {props => <Hello {...props} isAuth={isAuth} />}
       </Stack.Screen>

@@ -36,7 +36,6 @@ const Summary = ({ route, navigation }) => {
     const getData = async () => {
         const u = await Storage.get('user');
         const token = await Storage.get('auth_token');
-        console.log('Getting data')
         axios.get('matches/' + matchId, token)
         .then(response=>{
             if (response.data) {
@@ -120,19 +119,19 @@ const Summary = ({ route, navigation }) => {
             });
         };
 
-        if (summary) {
-            socket.on('cancelledMatch_' + summary._id, handleCancelMatch)
-            socket.on('takenMatch_' + summary._id, handleTakenMatch); // A new match is saved in database
-            socket.on('deletePlace_' + summary._id, handleDeletedPlace);
-            socket.on('matchFinished_' + summary._id, handleFinishMatch);
+        if (summary && user) {
+            socket.on('cancelledMatch_' + user._id, handleCancelMatch)
+            socket.on('takenMatch_' + user._id, handleTakenMatch); // A new match is saved in database
+            socket.on('deletePlace_' + user._id, handleDeletedPlace);
+            socket.on('matchFinished_' + user._id, handleFinishMatch);
             return () => {
-                socket.off('cancelledMatch_' + summary._id, handleCancelMatch);
-                socket.off('takenMatch_' + summary._id, handleTakenMatch);
-                socket.off('deletePlace_' + summary._id, handleDeletedPlace);
-                socket.off('matchFinished_' + summary._id, handleFinishMatch);
+                socket.off('cancelledMatch_' + user._id, handleCancelMatch);
+                socket.off('takenMatch_' + user._id, handleTakenMatch);
+                socket.off('deletePlace_' + user._id, handleDeletedPlace);
+                socket.off('matchFinished_' + user._id, handleFinishMatch);
             };
         }
-    },[summary])
+    },[summary, user])
 
     // Add event listener for hardware back button press
     useEffect(() => {

@@ -40,9 +40,8 @@ const ChatList = ({ navigation }) => {
     };
     
     const getUser = async () => {
-        const getMe = await Storage.get('user');
-        console.log(getMe)
-        setMe(JSON.parse(getMe));
+        const user = await Storage.get('user');
+        setMe(JSON.parse(user));
     };
 
     return(

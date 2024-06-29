@@ -88,7 +88,7 @@ const LivePlace = ({ navigation, route }) => {
       },[])
     );
 
-    useEffect(() => {
+    useEffect(() => {      
       const getNewMatch = async (newMatchId) => {
           const token = await Storage.get('auth_token');
           axios.get('matches/' + newMatchId, token)
@@ -165,18 +165,22 @@ const LivePlace = ({ navigation, route }) => {
         })
       };
 
-      socket.on('newMatch_' + parkingId, getNewMatch); // A new match is saved in database
-      socket.on('cancelledMatch_' + parkingId, cancelMatch); // A match is cancelled by user or seller
-      socket.on('deletedMatch_' + parkingId, handleDeletedMatch); // A match is cancelled by user
-      socket.on('userMoved_', getUserPosition); // Once a match is created, user position is tracked
-      socket.on('matchFinished_' + parkingId, handleFinishMatch);
-      return () => {
-          socket.off('newMatch_' + parkingId, getNewMatch);
-          socket.off('cancelledMatch_' + parkingId, cancelMatch);
-          socket.off('deletedMatch_' + parkingId, handleDeletedMatch);
-          socket.off('userMoved_' + parkingId, getUserPosition);
-          socket.off('matchFinished_' + parkingId, handleFinishMatch);
+      const initLivePlaceSocket = async () => {
+        const user = await Storage.get('user');
+        socket.on('newMatch_' + JSON.parse(user)._id, getNewMatch); // A new match is saved in database
+        socket.on('cancelledMatch_' + JSON.parse(user)._id, cancelMatch); // A match is cancelled by user or seller
+        socket.on('deletedMatch_' + JSON.parse(user)._id, handleDeletedMatch); // A match is cancelled by user
+        socket.on('userMoved_' + parkingId, getUserPosition); // Once a match is created, user position is tracked
+        socket.on('matchFinished_' + JSON.parse(user)._id, handleFinishMatch);
+        return () => {
+            socket.off('newMatch_' + JSON.parse(user)._id, getNewMatch);
+            socket.off('cancelledMatch_' + JSON.parse(user)._id, cancelMatch);
+            socket.off('deletedMatch_' + JSON.parse(user)._id, handleDeletedMatch);
+            socket.off('userMoved_' + parkingId, getUserPosition);
+            socket.off('matchFinished_' + JSON.parse(user)._id, handleFinishMatch);
+        };
       };
+      initLivePlaceSocket();
     },[]);
     
     const handleZoomAndCenter = (coordinates) => {
