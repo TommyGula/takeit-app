@@ -27,7 +27,7 @@ const Home = ({ navigation }) => {
   const [region, setRegion] = useState(null);
   const [parkingPlaces, setParkingPlaces] = useState([]);
   const [selected, setSelected] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(0);
   const [centered, setCentered] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -71,7 +71,6 @@ const Home = ({ navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setOpen(selected != null);
       if (selected && selected.pageY) {
         scrollRef.current.scrollTo({ y: selected.pageY, animated: true })
       }
@@ -185,13 +184,13 @@ const Home = ({ navigation }) => {
           </MapView>
           {
             !centered && 
-          <TouchableOpacity style={styles.mapCenter} onPress={handleCenter}>
+          <TouchableOpacity style={[styles.mapCenter, {bottom:open}]} onPress={handleCenter}>
             <Image style={styles.mapCenterIcon} source={{uri:'https://cdn-icons-png.flaticon.com/512/1278/1278806.png'}}></Image>
           </TouchableOpacity>
           }
 
           {/* Here I will display users offering their place near me */}
-          <DraggableBottomSheet open={selected != null} selected={selected}>
+          <DraggableBottomSheet open={selected != null} setOpen={setOpen} selected={selected}>
             <View style={styles.sectionContainer}>
               <Text style={{...styles.lightTitle, color:"#000"}}>¡Hola {user.firstName}!</Text>
               <Text style={{...styles.sectionTitle, color:"#000"}}>¿Buscas lugar para estacionar?</Text>

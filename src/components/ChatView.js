@@ -11,15 +11,9 @@ const ChatView = ({ item, active, onPress, navigation }) => {
     navigation.navigate('Selection', { itemId: item._id });
   };
 
-  useEffect(() => {
-    if (active && position) {
-      onPress(position);
-    };
-  }, [position]);
-
   return (
     <TouchableWithoutFeedback onPress={() => onPress(position)}>
-      <View ref={ref} onLayout={() => handleLayout(ref, (pos) => setPosition(pos))} style={[(active ? chatViewStyles.itemCardActive : {}), chatViewStyles.itemCard]}>
+      <View ref={ref} onLayout={() => handleLayout(ref, (pos) => setPosition(pos))} style={[chatViewStyles.itemCard]}>
         <View style={{...chatViewStyles.itemCardContent}}>
           <View style={chatViewStyles.imageContainer}>
             <Image
@@ -30,28 +24,21 @@ const ChatView = ({ item, active, onPress, navigation }) => {
           <View style={chatViewStyles.description}>
             <Text style={{...styles.text, ...styles.bold}}>{item.name}</Text>
             {
-              item.messages.length ?
-              <Text style={{...styles.text, ...styles.small}}>{shortText(item.messages[item.messages.length-1].message, 25, active)}</Text> : 
-              <Text style={{...styles.text, ...styles.small}}>Nuevo chat</Text>
+              item.latestMessage ?
+              <Text style={{...styles.text, ...styles.small, fontWeight:(active ? 800 : 100)}}>{shortText(item.latestMessage.message, 25, active)}</Text> : 
+              <Text style={{...styles.text, ...styles.small, fontWeight:(active ? 800 : 100)}}>Nuevo chat</Text>
             }
           </View>
           {
-            item.messages.length ?
+            item.latestMessage ?
             <View style={chatViewStyles.createdAt}>
-              <Text style={{...styles.text}}>{new Date(item.messages[0].createdAt).getHours()}:{new Date(item.messages[item.messages.length-1].createdAt).getMinutes()} hs</Text>
+              <Text style={{...styles.small, fontWeight:(active ? 800 : 100)}}>{new Date(item.latestMessage.createdAt).toLocaleDateString() + '\n'}{new Date(item.latestMessage.createdAt).getHours().toString().padStart(2, '0')}:{new Date(item.latestMessage.createdAt).getMinutes().toString().padStart(2, '0')} hs</Text>
             </View> : 
             <View style={chatViewStyles.createdAt}>
-              <Text style={{...styles.text}}>{new Date(item.createdAt).getHours()}:{new Date(item.createdAt).getMinutes()} hs</Text>
+              <Text style={{...styles.small, fontWeight:(active ? 800 : 100)}}>{new Date(item.createdAt).toLocaleDateString() + '\n'}{new Date(item.createdAt).getHours().toString().padStart(2, '0')}:{new Date(item.createdAt).getMinutes().toString().padStart(2, '0')} hs</Text>
             </View>
           }
         </View>
-        {
-          active &&
-          <View style={chatViewStyles.ctaSection}>
-            <Button style={chatViewStyles.cta} title={'Reservar'} onPress={handleBook} color={'secondary'}></Button>
-            <Button style={chatViewStyles.cta} title={'Ir al chat'} onPress={handleBook} color={'secondary'}></Button>
-          </View>
-        }
       </View>
     </TouchableWithoutFeedback>
   );

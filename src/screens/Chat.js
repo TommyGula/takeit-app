@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useLayoutEffect } from "react";
+import React, { useEffect, useState, useLayoutEffect, useRef } from "react";
 import { View, Text, ScrollView } from "react-native";
 import Button from "../components/Button";
 import MessageBubble from "../components/MessageBubble";
@@ -15,6 +15,12 @@ const Chat = ({ route, navigation }) => {
     const [me, setMe] = useState(null);
     const [loading, setLoading] = useState(true);
     const [messages, setMessages] = useState([]);
+
+    const scrollViewRef = useRef(null);
+
+    const scrollToBottom = () => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    };
 
     const { showNotification } = useNotification();
 
@@ -46,7 +52,7 @@ const Chat = ({ route, navigation }) => {
         };
         axios.post('messages', newMessage, token)
         .then(response => {
-            //console.log(response)
+            scrollToBottom();
         })
         .catch(err => {
             console.log('Error', err.message);
@@ -56,6 +62,7 @@ const Chat = ({ route, navigation }) => {
     useEffect(() => {
         if (me) {
             getChat();
+            scrollToBottom();
         } else {
             getUser();
         };
@@ -67,6 +74,13 @@ const Chat = ({ route, navigation }) => {
             axios.get('messages/' + newMessageId, token)
             .then(response => {
                 setMessages(prevMessages => [...prevMessages, response.data]);
+                axios.put('messages/' + newMessageId, {read:true}, token)
+                .then(updated => {
+                    
+                })
+                .catch(err => {
+                    console.log(err)
+                })
             })
             .catch(err => {
                 console.log(err)
@@ -92,6 +106,11 @@ const Chat = ({ route, navigation }) => {
             if (response.data) {
                 setChat(response.data);
                 setMessages(response.data.messages);
+                axios.put('messages/read/' + chatId + '/' + me._id, {read:true}, token)
+                .then(updated => null)
+                .catch(err => {
+                    console.log(err)
+                })
             } else {
                 showNotification('Error', response.message);
             };
@@ -109,8 +128,8 @@ const Chat = ({ route, navigation }) => {
         {
             !loading && chat && me ?
             <>
-                <View style={{padding:20,height:'100%'}}>
-                    <ScrollView vertical showsVerticalScrollIndicator={false}>
+                <View style={{paddingHorizontal:20, paddingBottom:50, height:'100%'}}>
+                    <ScrollView vertical showsVerticalScrollIndicator={false} ref={scrollViewRef} style={{paddingTop:20}}>
                         {
                             messages.map((m,i) => {
                                 const time = new Date(m.createdAt).getHours() + ":" + new Date(m.createdAt).getMinutes();

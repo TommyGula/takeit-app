@@ -23,7 +23,6 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { styles } from './styles/global';
 import AuthService from './services/AuthService';
 
-
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 

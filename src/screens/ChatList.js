@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { View, ScrollView, Text } from "react-native";
 import { styles } from "../styles/global";
 import ChatView from "../components/ChatView";
 import axios from '../utils/axios';
 import Storage from "../services/Storage";
 import Loading from "./Loading";
+import socket from '../services/SocketIO';
 import { useNotification } from "../NotificationProvider";
 
 const ChatList = ({ navigation }) => {
@@ -14,13 +16,24 @@ const ChatList = ({ navigation }) => {
 
     const { showNotification } = useNotification();
 
-    useEffect(() => {
-        if (me) {
-            getChats();
-        } else {
-            getUser();
-        }
-    },[me]);
+    useFocusEffect(
+        React.useCallback(() => {
+
+            if (me) {
+                getChats();
+            } else {
+                getUser();
+            };
+            if (me) {
+                socket.on('receivedMessage_' + me._id, getChats);
+                socket.on('newMessage_' + me._id, getChats);
+                return () => {
+                    socket.off('receivedMessage_' + me._id, getChats);
+                    socket.off('newMessage_' + me._id, getChats);
+                };
+            }
+        }, [me])
+    );
     
     const getChats = async () => {
         const token = await Storage.get('auth_token');
@@ -50,13 +63,13 @@ const ChatList = ({ navigation }) => {
             {
                 !loading && chats && me ?
                 <>
-                    <View style={[styles.scrollViewContainer, {paddingVertical:20}]}>
+                    <View style={styles.scrollViewContainer}>
                     <ScrollView vertical showsVerticalScrollIndicator={false} style={[styles.scrollView, {height:'100%'}]}>
                         {chats.map((chat,i) => { // nearByUsers will be the fetched data of type "parking"
                             chat['name'] = chat.titles[me._id];
                             return(
                                 // The card will show the price, the user picture and pictures if there are
-                                <ChatView key={i} item={chat} active={false} navigation={navigation} onPress={() => navigation.navigate('Chat', { userName: chat['name'], chatId: chat['_id'] })}/>
+                                <ChatView key={i} item={chat} active={chat.hasUnread} navigation={navigation} onPress={() => navigation.navigate('Chat', { userName: chat['name'], chatId: chat['_id'] })}/>
                             )
                         })}
                         {

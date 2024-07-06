@@ -60,3 +60,14 @@ Al cargar, espera por el socket matchTaken. Si el usuario que envía en el param
 
 - Al crear un auto o documento, vuelve atrás a "Mi Perfil" pero no actualiza los datos con el auto o documento nuevo creado
 - Si al iniciar hay "alerta" en el menu, al ingresar a Pendiente o a Compartir debería saltar directamente a la página en el estado en el que se encuentra
+
+**2024-07-04**
+
+- [X] Pasar la variable *screen* correctamente a la funcion showNotification en NotificationProvider.js
+- [X] Agregar el socket para actualizar los chats frente a un nuevo mensaje estando en la pantalla de Chats
+- [X] Ordenar los chats según el createdDate del último mensaje que cada uno tenga
+- [X] Eliminar de la lista los chats con el mismo usuario
+- [X] Hacer un scroll down al escribir un nuevo mensaje para visualizarlo
+- [X] Distinguir los mensajes entre leidos y no leidos en el listado de Chats
+- [] Detectar si un nuevo mensaje que acaba de llegar es visible en pantalla. Si lo es, marcar como leido, si no, mostrar cartel de nuevo mensaje
+- [] Crear pantalla de Connection Error (no hay internet)
