@@ -6,13 +6,14 @@ import Logo from '../../assets/images/logo.png';
 const Hello = ({ isAuth, navigation }) => {
 
     useEffect(() => {
-        switch (isAuth) {
-            case false:
+        if (!isAuth) {
+            console.log('Waiting...')
+        } else {
+            if (isAuth == false) {
                 navigation.navigate('Login');
-            case true:
+            } else {
                 navigation.navigate('Home');
-            default:
-                console.log('Waiting...')
+            }
         }
     },[isAuth]);
 

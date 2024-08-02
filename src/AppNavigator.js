@@ -26,7 +26,7 @@ import AuthService from './services/AuthService';
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
-const AppNavigator = () => {
+const AppNavigator = ({ setLinking }) => {
   const [isAuth, setIsAuth] = useState(null);
 
   useEffect(() => {
@@ -35,6 +35,14 @@ const AppNavigator = () => {
 
   useEffect(() => {
     console.log('Is Auth changed ' + isAuth)
+    setLinking({
+      prefixes: ['busytownapp://'],
+      config: {
+        screens: {
+          Settings: 'profile',
+        },
+      },
+    })
   },[isAuth]);
   
   const checkAuthentication = async () => {

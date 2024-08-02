@@ -4,7 +4,7 @@ import { styles, colors } from "../styles/global";
 import { handleLayout, shortText } from "../utils/helpers";
 import Button from "./Button";
 
-const ListView = ({ item, active, onPress, navigation, pre, style, leftButtonAction, leftButtonLabel, rightButtonAction, rightButtonLabel }) => {
+const ListView = ({ item, active, onPress, navigation, pre, style, leftButtonAction, leftButtonLabel, rightButtonAction, rightButtonLabel, maxLength }) => {
   const [position, setPosition] = useState(null);
   const ref = useRef(null);
   const handleBook = () => {
@@ -38,7 +38,7 @@ const ListView = ({ item, active, onPress, navigation, pre, style, leftButtonAct
                 <Text style={{...styles.text, ...styles.bold}}>{item.userId.firstName + ' ' + item.userId.lastName}</Text>:
                 <Text style={{...styles.text, ...styles.bold}}>{item.name}</Text>
               }
-              <Text style={{...styles.text, ...styles.small}}>{shortText(item.location, 35, active)}</Text>
+              <Text style={{...styles.text, ...styles.small}}>{shortText(item.location, (maxLength || 35), active)}</Text>
             </View>
           </View>
           <View style={listViewStyles.price}>
@@ -94,7 +94,7 @@ const listViewStyles = StyleSheet.create({
     width:'60%'
   },
   price: {
-
+    marginLeft:-20
   },
   ctaSection: {
     paddingTop:15,

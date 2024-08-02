@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, ScrollView, StyleSheet, ImageBackground, Text } from "react-native";
+import { View, ScrollView, StyleSheet, ImageBackground, Text, Image, Linking } from "react-native";
 import LinearGradient from 'react-native-linear-gradient';
-import { colors, styles } from "../styles/global";
+import { styles } from "../styles/global";
 import Media from "../components/Media";
 import ListView from "../components/ListView";
 import Button from "../components/Button";
 import Wallpaper from '../../assets/images/29.jpeg';
+import MPIcon from '../../assets/icons/mp.png';
 import axios from '../utils/axios';
 import Storage from "../services/Storage";
 import { useNotification } from "../NotificationProvider";
@@ -18,6 +19,7 @@ const Profile = ({ navigation, route }) => {
     const [cars, setCars] = useState([]);
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [paymentMethods, setPaymentMethods] = useState([]);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -28,6 +30,23 @@ const Profile = ({ navigation, route }) => {
             }
         },[])
     );
+
+    const activateMercadoPago = async () => {
+        const u = await Storage.get('user');
+        const token = await Storage.get('auth_token');
+        const currUser = JSON.parse(u);
+		const url = await axios.get('mp/auth/' + currUser._id, token);
+        const redirect_url = url && url.data ? url.data.redirect_url : null;
+        Linking.canOpenURL(redirect_url)
+        .then((supported) => {
+            if (supported) {
+            Linking.openURL(redirect_url);
+            } else {
+            console.log(`Don't know how to open URL: ${redirect_url}`);
+            }
+        })
+        .catch((err) => console.log('An error occurred', err));
+	}
 
     const { showNotification } = useNotification(); 
 
@@ -87,7 +106,28 @@ const Profile = ({ navigation, route }) => {
                         type:'Cédula Azul',
                     })
                 }),
-            ])
+            ]);
+            const isMpSet = (responses[0].data.mercadoPago && responses[0].data.mercadoPago.access_token && responses[0].data.mercadoPago.refresh_token);
+            setPaymentMethods([
+                {
+                    id:'efectivo',
+                    name:"Efectivo",
+                    payment_type_id:'efectivo',
+                    image:'https://cdn-icons-png.freepik.com/512/2997/2997145.png',
+                },
+                {
+                    id:'mp',
+                    name:"MercadoPago",
+                    payment_type_id:'mp',
+                    image:Image.resolveAssetSource(MPIcon).uri,
+                    location:profileUser ? '' : (isMpSet ? 'Habilitado' : '¡Habilitá MercadoPago para recibir tus cobros!'),
+                    link:isMpSet ? false : true,
+                    linkLabel:profileUser ? null : (isMpSet ? false : 'habilitar >'),
+                },
+            ]);
+            if (!isMpSet) {
+                showNotification('¡Activá Mercado Pago!', 'Facilitá tus transacciones habilitando Mercado Pago desde el la sección "Mis medios de pago"', null, 'alert')
+            };
             setLoading(false);
         })
         .catch(err=> {
@@ -171,6 +211,17 @@ const Profile = ({ navigation, route }) => {
                                         }
                                         return(
                                             <ListView key={i} item={doc} active={false} navigation={navigation} onPress={() => navigation.navigate('NewDocument', { docId: item._id, docType: item.type, userId: profileUser ? profileUser._id : null })}/>
+                                        )
+                                    })
+                                }
+                            </View>
+                            {/* Medios de pago */}
+                            <View style={profileStyles.profileSection}>
+                                <Text style={styles.sectionTitle}>{profileUser ? 'Medios de pago' : 'Mis medios de pago'}</Text>
+                                {
+                                    paymentMethods.map((type,i) => {
+                                        return(
+                                            <ListView onPress={type.id == 'mp' ? activateMercadoPago : () => null} maxLength={100} key={i} item={type} active={false} navigation={navigation} />
                                         )
                                     })
                                 }

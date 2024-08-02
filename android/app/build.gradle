@@ -87,7 +87,7 @@ android {
         applicationId "com.busytownapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 4
+        versionCode 5
         versionName "1.0"
         resValue "string", "build_config_package", "com.busytownapp"
         missingDimensionStrategy 'react-native-camera', 'general'

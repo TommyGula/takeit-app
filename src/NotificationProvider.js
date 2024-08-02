@@ -19,7 +19,6 @@ export const NotificationProvider = ({ children, screen }) => {
   }, [screen]);
 
   const showNotification = (title, message, duration=3000, type = 'snackbar', callback = null, buttons = null, cancelable = true, onDismiss = () => null, routes) => {
-    console.log('Should send? ' + JSON.stringify(routes) + screenRef.current);
     if (routes && routes.take && !routes.take.includes(screenRef.current)) {
       return;
     };
