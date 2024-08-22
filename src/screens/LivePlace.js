@@ -302,7 +302,7 @@ const LivePlace = ({ navigation, route }) => {
                 <Image style={[styles.mapCenterIcon]} source={{uri:'https://cdn-icons-png.flaticon.com/512/1278/1278806.png'}}></Image>
             </TouchableOpacity>
             }
-            <DraggableBottomSheet isStatic={false}>
+            <DraggableBottomSheet isStatic={false} setOpen={setOpen}>
               {
                 !acceptedMatch ?
                 <>

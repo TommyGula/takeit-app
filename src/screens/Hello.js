@@ -6,9 +6,10 @@ import Logo from '../../assets/images/logo.png';
 const Hello = ({ isAuth, navigation }) => {
 
     useEffect(() => {
-        if (!isAuth) {
+        if (isAuth == null) {
             console.log('Waiting...')
         } else {
+            console.log('Is auth? ', isAuth)
             if (isAuth == false) {
                 navigation.navigate('Login');
             } else {

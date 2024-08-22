@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import NetInfo from '@react-native-community/netinfo';
 
 // Screens
 import Home from './screens/Home';
@@ -14,6 +15,8 @@ import NewPlace from './screens/NewPlace';
 import LivePlace from './screens/LivePlace';
 import Login from './screens/Login';
 import Hello from './screens/Hello';
+import ConnError from './screens/ConnError';
+import AuthService from './services/AuthService';
 
 // Navigatior
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -21,20 +24,35 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 
 // Styles
 import { styles } from './styles/global';
-import AuthService from './services/AuthService';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 const AppNavigator = ({ setLinking }) => {
   const [isAuth, setIsAuth] = useState(null);
+  const [isConnected, setIsConnected] = useState(true);
 
   useEffect(() => {
     checkAuthentication();
   },[]);
 
   useEffect(() => {
-    console.log('Is Auth changed ' + isAuth)
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected !== null && state.isConnected);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  const handleRetry = () => {
+    NetInfo.fetch().then((state) => {
+      setIsConnected(state.isConnected !== null && state.isConnected);
+    });
+  };
+
+  useEffect(() => {
     setLinking({
       prefixes: ['busytownapp://'],
       config: {
@@ -54,28 +72,28 @@ const AppNavigator = ({ setLinking }) => {
     }
   };
 
+  if (!isConnected) {
+    return <ConnError onRetry={handleRetry} />;
+  }
+
   return (
     <Stack.Navigator initialRouteName="Hello" style={styles.app}>
       <Stack.Screen name="Hello" options={{ title: 'Hello', headerShown: false }} >
         {props => <Hello {...props} isAuth={isAuth} />}
       </Stack.Screen>
-      {
-        isAuth ? 
-        <>
-          <Stack.Screen name="Home" component={Home} options={{ title: 'Home', headerShown: false }} />
-          <Stack.Screen name="Selection" component={Selection} options={{ title: 'Confirmación' }} />
-          <Stack.Screen name="Summary" component={Summary} options={{ title: 'Resumen' }} />
-          <Stack.Screen name="Chats" component={ChatList} options={{ title: 'Chats' }} />
-          <Stack.Screen name="Settings" component={Profile} options={{ title: 'Mi Perfil' }} />
-          <Stack.Screen name="UserProfile" component={Profile} options={({ route }) => ({ title: route.params.profileUser.firstName + ' ' + route.params.profileUser.lastName })} />
-          <Stack.Screen name="NewCar" component={NewCar} options={({ route }) => ({ title: route.params && route.params.carId ? 'Editar Auto' : 'Nuevo Auto' })} />
-          <Stack.Screen name="ViewCar" component={NewCar} options={({ route }) => ({ title: route.params.carName })} />
-          <Stack.Screen name="NewDocument" component={NewDocument} options={({route}) => ({ title: route.params && route.params.docId && route.params.userId ? 'Ver Documento' : route.params && route.params.docId ? 'Editar Documento' : 'Nuevo Documento' })} />
-          <Stack.Screen name="NewPlace" component={NewPlace} options={{ title: 'Iniciar Búsqueda' }} />
-          <Stack.Screen name="LivePlace" component={LivePlace} options={{ title: 'Búsqueda', headerShown: false }} />
-          <Stack.Screen name="Chat" component={Chat} options={({ route }) => ({ title: route.params.userName })} />
-          <Stack.Screen name="Logout" component={Logout} options={{ title: 'Logout' }} initialParams={{ setIsAuth:setIsAuth }}/>
-        </> : 
+      <Stack.Screen name="Home" component={Home} options={{ title: 'Home', headerShown: false }} />
+      <Stack.Screen name="Selection" component={Selection} options={{ title: 'Confirmación' }} />
+      <Stack.Screen name="Summary" component={Summary} options={{ title: 'Resumen' }} />
+      <Stack.Screen name="Chats" component={ChatList} options={{ title: 'Chats' }} />
+      <Stack.Screen name="Settings" component={Profile} options={{ title: 'Mi Perfil' }} />
+      <Stack.Screen name="UserProfile" component={Profile} options={({ route }) => ({ title: route.params.profileUser.firstName + ' ' + route.params.profileUser.lastName })} />
+      <Stack.Screen name="NewCar" component={NewCar} options={({ route }) => ({ title: route.params && route.params.carId ? 'Editar Auto' : 'Nuevo Auto' })} />
+      <Stack.Screen name="ViewCar" component={NewCar} options={({ route }) => ({ title: route.params.carName })} />
+      <Stack.Screen name="NewDocument" component={NewDocument} options={({route}) => ({ title: route.params && route.params.docId && route.params.userId ? 'Ver Documento' : route.params && route.params.docId ? 'Editar Documento' : 'Nuevo Documento' })} />
+      <Stack.Screen name="NewPlace" component={NewPlace} options={{ title: 'Iniciar Búsqueda' }} />
+      <Stack.Screen name="LivePlace" component={LivePlace} options={{ title: 'Búsqueda', headerShown: false }} />
+      <Stack.Screen name="Chat" component={Chat} options={({ route }) => ({ title: route.params.userName })} />
+      <Stack.Screen name="Logout" component={Logout} options={{ title: 'Logout' }} initialParams={{ setIsAuth:setIsAuth }}/>
         <Stack.Screen 
         name="Login" 
         component={Login} 
@@ -87,7 +105,6 @@ const AppNavigator = ({ setLinking }) => {
           setIsAuth:setIsAuth
         }}
         />
-      }
     </Stack.Navigator>
   );
 };

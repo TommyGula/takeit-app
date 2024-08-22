@@ -69,8 +69,8 @@ Al cargar, espera por el socket matchTaken. Si el usuario que envía en el param
 - [X] Eliminar de la lista los chats con el mismo usuario
 - [X] Hacer un scroll down al escribir un nuevo mensaje para visualizarlo
 - [X] Distinguir los mensajes entre leidos y no leidos en el listado de Chats
-- [] Detectar si un nuevo mensaje que acaba de llegar es visible en pantalla. Si lo es, marcar como leido, si no, mostrar cartel de nuevo mensaje
+- [X*] Detectar si un nuevo mensaje que acaba de llegar es visible en pantalla. Si lo es, marcar como leido, si no, mostrar cartel de nuevo mensaje
 - [] Crear pantalla de Connection Error (no hay internet)
 - [X] Crear habilitación de medio de pago
 - [] Crear pago con mercadopago
-- [] Modificar utils/mercadopago.js y crear una api que traiga los medios de pago SEGUN EL USUARIO en lugar de llamar directamente a la api de MP
+- [X] Modificar utils/mercadopago.js y crear una api que traiga los medios de pago SEGUN EL USUARIO en lugar de llamar directamente a la api de MP

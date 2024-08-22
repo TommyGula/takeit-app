@@ -55,6 +55,7 @@ const TapMenu = () => {
         const token = await Storage.get('auth_token');
         const u = await Storage.get('user');
         const user = JSON.parse(u);
+
         setCurrUser(user);
         const isBuyer = axios.get('matches?cancelled=false&payed=false&buyerId=' + user._id, token);
         const isSeller = axios.get('matches?cancelled=false&payed=false&sellerId=' + user._id, token);

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, ImageBackground } from "react-native";
 import { prettyPrice } from "../utils/helpers";
 import { styles, colors } from "../styles/global";
+import MPIcon from '../../assets/icons/mp.png';
 import { requestLocationPermission } from '../services/ClientPermission';
 import Geolocation from 'react-native-geolocation-service';
 import Button from "../components/Button";
@@ -20,9 +21,8 @@ import Media from "../components/Media";
 
 const Selection = ({ navigation, route }) => {
     const { itemId } = route.params;
-    const initialState = 'efectivo';
-    const [paymentMethods, setPaymentMethods] = useState({});
-    const [method, setMethod] = useState(initialState);
+    const [paymentMethods, setPaymentMethods] = useState([]);
+    const [method, setMethod] = useState('mercadopago');
     const [modalVisible, setModalVisible] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -37,9 +37,9 @@ const Selection = ({ navigation, route }) => {
     },[]);
 
     const cash = [{
-        id:initialState,
+        id:'efectivo',
         name:"Efectivo",
-        payment_type_id:initialState,
+        payment_type_id:'efectivo',
         thumbnail:'https://cdn-icons-png.freepik.com/512/2997/2997145.png'
     }];
 
@@ -62,17 +62,21 @@ const Selection = ({ navigation, route }) => {
     };
 
     const getPaymentMethods = () => {
-        MP.paymentMethods()
+        axios.get('mp/payment/methods/' + item.userId._id, route.params.token)
             .then(data => {
+                if (!data.data.length) {
+                    setMethod('efectivo');
+                };
                 data = [...cash, ...data.data];
-                setPaymentMethods(data.reduce((r, a) => {
+/*                 setPaymentMethods(data.reduce((r, a) => {
                     if (r[a.payment_type_id]) {
                         r[a.payment_type_id].push(a);
                     } else {
                         r[a.payment_type_id] = [a];
                     }
                     return r;
-                }, { }));
+                }, { })); */
+                setPaymentMethods(data);
             })
             .catch (err => {
                 console.log('MP ERROR: ' ,err);
@@ -126,8 +130,10 @@ const Selection = ({ navigation, route }) => {
     };
 
     useEffect(() => {
-        getPaymentMethods();
-    }, []);
+        if (item) {
+            getPaymentMethods();
+        }
+    }, [item]);
 
     const openCarousel = (i) => {
         setModalVisible(true);
@@ -202,21 +208,24 @@ const Selection = ({ navigation, route }) => {
                                 <View>
                                     <RadioButton.Group onValueChange={value => setMethod(value)} value={method}>
                                         {
-                                            Object.keys(paymentMethods).map((type, i) => {
-                                                if (type.replace("_", " ").toLocaleUpperCase() == 'EFECTIVO') {
-                                                    return (
-                                                        <View key={i} style={{marginBottom:0}}>
-                                                            <Dropdown index={i} startsOpen={type == initialState} childProps={(x) => {
-                                                                return(
-                                                                    {
-                                                                        onPress:() => setMethod(x),
-                                                                        active:method == x
-                                                                    }
-                                                                )
-                                                            }} Component={Payment} options={paymentMethods[type]} title={type.replace("_", " ").toLocaleUpperCase()}></Dropdown>
-                                                        </View>
-                                                    )
-                                                }
+/*                                             Object.keys(paymentMethods).map((type, i) => {
+                                                return (
+                                                    <View key={i} style={{marginBottom:0}}>
+                                                        <Dropdown index={i} startsOpen={true} childProps={(x) => {
+                                                            return(
+                                                                {
+                                                                    onPress:() => setMethod(x),
+                                                                    active:method == x
+                                                                }
+                                                            )
+                                                        }} Component={Payment} options={paymentMethods[type]} title={type.replace("_", " ").toLocaleUpperCase()}></Dropdown>
+                                                    </View>
+                                                )
+                                            }) */
+                                            paymentMethods.map((type, i) => {
+                                                return(
+                                                    <Payment key={i} onPress={() => setMethod(x)} active={method == type.id} item={type} name={type.id}></Payment>
+                                                )
                                             })
                                         }
                                     </RadioButton.Group>
