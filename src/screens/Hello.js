@@ -2,21 +2,23 @@ import React, { useEffect } from "react";
 import { StyleSheet, View, Image } from "react-native";
 import { styles } from "../styles/global";
 import Logo from '../../assets/images/logo.png';
+import { useFocusEffect } from "@react-navigation/native";
 
 const Hello = ({ isAuth, navigation }) => {
-
-    useEffect(() => {
-        if (isAuth == null) {
-            console.log('Waiting...')
-        } else {
-            console.log('Is auth? ', isAuth)
-            if (isAuth == false) {
-                navigation.navigate('Login');
+    useFocusEffect(
+        React.useCallback(() => {
+            if (isAuth == null) {
+                console.log('Waiting...')
             } else {
-                navigation.navigate('Home');
+                console.log('Is auth? ', isAuth)
+                if (isAuth == false) {
+                    navigation.navigate('Login');
+                } else {
+                    navigation.navigate('Home');
+                }
             }
-        }
-    },[isAuth]);
+        },[isAuth])
+    );
 
     return(
         <View style={[styles.container, {backgroundColor:'#fafafa', padding:20, flexDirection:'column', alignItems:'center', justifyContent:'center'}]}>

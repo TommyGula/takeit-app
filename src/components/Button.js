@@ -4,7 +4,7 @@ import { colors, styles } from '../styles/global';
 
 const Button = ({ title, children, onPress, color, style={}, styleText={}, disabled=false }) => {
   return (
-    <TouchableOpacity disabled={disabled} style={[buttonStyles.button, { backgroundColor: colors[disabled ? 'gray' : color]['main'] }, style]} onPress={onPress}>
+    <TouchableOpacity disabled={disabled} style={[buttonStyles.button, { backgroundColor: color.includes('#') ? color : colors[disabled ? 'gray' : color]['main'] }, style]} onPress={onPress}>
       <Text style={[styles.app, styles.bold, buttonStyles.buttonText, styleText]}>{title || children}</Text>
     </TouchableOpacity>
   );

@@ -17,6 +17,7 @@ import Storage from '../services/Storage';
 import socket from '../services/SocketIO';
 import Geocoder from '../utils/geocoder';
 import { useFocusEffect } from '@react-navigation/native';
+import ScrollViewContainer from '../components/ScrollViewContainer';
 
 // Axios
 import axios from '../utils/axios';
@@ -32,7 +33,6 @@ const Home = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
 
   const { showNotification } = useNotification();
-  const scrollRef = useRef(null);
   const mapRef = useRef(null);
 
   useFocusEffect(
@@ -68,14 +68,6 @@ const Home = ({ navigation }) => {
       }
     },[region])
   )
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (selected && selected.pageY) {
-        scrollRef.current.scrollTo({ y: selected.pageY, animated: true })
-      }
-    },[selected])
-  );
 
   useFocusEffect(
     React.useCallback(() => {
@@ -196,16 +188,14 @@ const Home = ({ navigation }) => {
               <Text style={{...styles.sectionTitle, color:"#000"}}>¿Buscas lugar para estacionar?</Text>
             </View>
             <View style={styles.section}>
-              <View style={styles.scrollViewContainer}>
-                <ScrollView ref={scrollRef} vertical showsVerticalScrollIndicator={false} style={styles.scrollView}>
-                    {parkingPlaces.map((parking,i) => { // nearByUsers will be the fetched data of type "parking"
-                      return(
-                        // The card will show the price, the user picture and pictures if there are
-                        <ListView style={{paddingHorizontal:20}} key={i} item={parking} pre='$ ' active={selected && selected._id == parking._id} navigation={navigation} onPress={(pos) => setSelected({...parking, ...pos})}/>
-                      )
-                    })}
-                </ScrollView>
-              </View>
+            <ScrollViewContainer selected={selected}>
+              {parkingPlaces.map((parking,i) => { // nearByUsers will be the fetched data of type "parking"
+                return(
+                  // The card will show the price, the user picture and pictures if there are
+                  <ListView style={{paddingHorizontal:20}} key={i} item={parking} pre='$ ' active={selected && selected._id == parking._id} navigation={navigation} onPress={(pos) => setSelected({...parking, ...pos})}/>
+                )
+              })}
+            </ScrollViewContainer>
             </View>
             {
               !parkingPlaces.length ?

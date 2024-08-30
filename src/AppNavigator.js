@@ -17,6 +17,7 @@ import Login from './screens/Login';
 import Hello from './screens/Hello';
 import ConnError from './screens/ConnError';
 import AuthService from './services/AuthService';
+import Payment from './screens/Payment';
 
 // Navigatior
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -58,6 +59,9 @@ const AppNavigator = ({ setLinking }) => {
       config: {
         screens: {
           Settings: 'profile',
+          PaymentSuccess: 'paymentsuccess',
+          PaymentError: 'paymenterror',
+          PaymentPending: 'paymentpending',
         },
       },
     })
@@ -94,7 +98,10 @@ const AppNavigator = ({ setLinking }) => {
       <Stack.Screen name="LivePlace" component={LivePlace} options={{ title: 'Búsqueda', headerShown: false }} />
       <Stack.Screen name="Chat" component={Chat} options={({ route }) => ({ title: route.params.userName })} />
       <Stack.Screen name="Logout" component={Logout} options={{ title: 'Logout' }} initialParams={{ setIsAuth:setIsAuth }}/>
-        <Stack.Screen 
+      <Stack.Screen name="PaymentSuccess" component={Payment} options={{ title: 'Pago Exitoso' }} initialParams={{ status:'success' }}/>
+      <Stack.Screen name="PaymentError" component={Payment} options={{ title: 'Pago Fallido' }} initialParams={{ status:'error' }}/>
+      <Stack.Screen name="PaymentPending" component={Payment} options={{ title: 'Pago Pendiente' }} initialParams={{ status:'pending' }}/>
+      <Stack.Screen 
         name="Login" 
         component={Login} 
         options={{ 

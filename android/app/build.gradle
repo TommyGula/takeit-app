@@ -87,7 +87,7 @@ android {
         applicationId "com.busytownapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 5
+        versionCode 6
         versionName "1.0"
         resValue "string", "build_config_package", "com.busytownapp"
         missingDimensionStrategy 'react-native-camera', 'general'
@@ -133,3 +133,4 @@ dependencies {
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
