@@ -10,7 +10,7 @@ const Logout = ({ route }) => {
             };
         })
     });
-    return(
+    return (
         <Loading></Loading>
     );
 };

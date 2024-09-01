@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import NetInfo from '@react-native-community/netinfo';
+import { useNavigation } from '@react-navigation/native';
 
 // Screens
 import Home from './screens/Home';
@@ -30,12 +31,13 @@ const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 const AppNavigator = ({ setLinking }) => {
+  const navigation = useNavigation();
   const [isAuth, setIsAuth] = useState(null);
   const [isConnected, setIsConnected] = useState(true);
 
   useEffect(() => {
     checkAuthentication();
-  },[]);
+  }, []);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
@@ -46,6 +48,12 @@ const AppNavigator = ({ setLinking }) => {
       unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (isAuth !== null) {
+      navigation.navigate('Hello'); // Redirect to "Hello" when isAuth changes
+    }
+  }, [isAuth, navigation]);
 
   const handleRetry = () => {
     NetInfo.fetch().then((state) => {
@@ -65,8 +73,8 @@ const AppNavigator = ({ setLinking }) => {
         },
       },
     })
-  },[isAuth]);
-  
+  }, [isAuth]);
+
   const checkAuthentication = async () => {
     const data = await AuthService.getUserAndTokenIfAuthenticated();
     if (data) {
@@ -93,25 +101,25 @@ const AppNavigator = ({ setLinking }) => {
       <Stack.Screen name="UserProfile" component={Profile} options={({ route }) => ({ title: route.params.profileUser.firstName + ' ' + route.params.profileUser.lastName })} />
       <Stack.Screen name="NewCar" component={NewCar} options={({ route }) => ({ title: route.params && route.params.carId ? 'Editar Auto' : 'Nuevo Auto' })} />
       <Stack.Screen name="ViewCar" component={NewCar} options={({ route }) => ({ title: route.params.carName })} />
-      <Stack.Screen name="NewDocument" component={NewDocument} options={({route}) => ({ title: route.params && route.params.docId && route.params.userId ? 'Ver Documento' : route.params && route.params.docId ? 'Editar Documento' : 'Nuevo Documento' })} />
+      <Stack.Screen name="NewDocument" component={NewDocument} options={({ route }) => ({ title: route.params && route.params.docId && route.params.userId ? 'Ver Documento' : route.params && route.params.docId ? 'Editar Documento' : 'Nuevo Documento' })} />
       <Stack.Screen name="NewPlace" component={NewPlace} options={{ title: 'Iniciar Búsqueda' }} />
       <Stack.Screen name="LivePlace" component={LivePlace} options={{ title: 'Búsqueda', headerShown: false }} />
       <Stack.Screen name="Chat" component={Chat} options={({ route }) => ({ title: route.params.userName })} />
-      <Stack.Screen name="Logout" component={Logout} options={{ title: 'Logout' }} initialParams={{ setIsAuth:setIsAuth }}/>
-      <Stack.Screen name="PaymentSuccess" component={Payment} options={{ title: 'Pago Exitoso' }} initialParams={{ status:'success' }}/>
-      <Stack.Screen name="PaymentError" component={Payment} options={{ title: 'Pago Fallido' }} initialParams={{ status:'error' }}/>
-      <Stack.Screen name="PaymentPending" component={Payment} options={{ title: 'Pago Pendiente' }} initialParams={{ status:'pending' }}/>
-      <Stack.Screen 
-        name="Login" 
-        component={Login} 
-        options={{ 
-          title: 'Login', 
-          headerShown: false, 
-        }} 
-        initialParams={{
-          setIsAuth:setIsAuth
+      <Stack.Screen name="Logout" component={Logout} options={{ title: 'Logout' }} initialParams={{ setIsAuth: setIsAuth }} />
+      <Stack.Screen name="PaymentSuccess" component={Payment} options={{ title: 'Pago Exitoso' }} initialParams={{ status: 'success' }} />
+      <Stack.Screen name="PaymentError" component={Payment} options={{ title: 'Pago Fallido' }} initialParams={{ status: 'error' }} />
+      <Stack.Screen name="PaymentPending" component={Payment} options={{ title: 'Pago Pendiente' }} initialParams={{ status: 'pending' }} />
+      <Stack.Screen
+        name="Login"
+        component={Login}
+        options={{
+          title: 'Login',
+          headerShown: false,
         }}
-        />
+        initialParams={{
+          setIsAuth: setIsAuth
+        }}
+      />
     </Stack.Navigator>
   );
 };

@@ -1,8 +1,8 @@
-import {Linking} from 'react-native';
+import { Linking } from 'react-native';
 import Button from './Button';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 
-const CheckoutPro = ({preference}) => {
+const CheckoutPro = ({ preference }) => {
   const openUrl = async url => {
     if (await InAppBrowser.isAvailable()) {
       InAppBrowser.open(url, {
@@ -35,7 +35,7 @@ const CheckoutPro = ({preference}) => {
     <Button
       title="&#128274; PAGAR"
       color="#4287F5"
-      onPress={() => openUrl(preference.response.response.sandbox_init_point)}
+      onPress={() => openUrl(preference.response.response[process.env.MP_INIT_POINT])}
     />
   );
 };
