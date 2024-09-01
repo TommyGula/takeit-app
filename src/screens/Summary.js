@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ScrollView,
   View,
@@ -9,39 +9,40 @@ import {
   BackHandler,
   Linking,
 } from 'react-native';
-import {styles, colors} from '../styles/global';
+import { styles, colors } from '../styles/global';
 import ParkIcon from '../../assets/icons/park.png';
 import MeIcon from '../../assets/icons/me.png';
 import Config from 'react-native-config';
 import Divider from '../components/Divider';
 import Table from '../components/Table';
 import Button from '../components/Button';
-import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
-import {requestLocationPermission} from '../services/ClientPermission';
+import { requestLocationPermission } from '../services/ClientPermission';
 import Loading from './Loading';
 import axios from '../utils/axios';
 import Storage from '../services/Storage';
 import Geolocation from 'react-native-geolocation-service';
-import {useNotification} from '../NotificationProvider';
+import { useNotification } from '../NotificationProvider';
 import socket from '../services/SocketIO';
 import Geocoder from '../utils/geocoder';
 import ModalComponent from '../components/Modal';
 import CheckoutPro from '../components/CheckoutPro';
 
-const Summary = ({route, navigation}) => {
-  const {matchId} = route.params;
+const Summary = ({ route, navigation }) => {
+  const { matchId } = route.params;
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [region, setRegion] = useState(null);
   const [open, setOpen] = useState(false);
   const [summary, setSummary] = useState(null);
+  const [summaryMatch, setSummaryMatch] = useState(null);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isCancelled, setIsCancelled] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [preference, setPreference] = useState(null);
 
-  const {showNotification} = useNotification();
+  const { showNotification } = useNotification();
 
   const mapRef = useRef(null);
 
@@ -52,6 +53,7 @@ const Summary = ({route, navigation}) => {
       .get('matches/' + matchId, token)
       .then(response => {
         if (response.data) {
+          setSummaryMatch(response.data);
           axios
             .get('places/' + response.data.parkingId, token)
             .then(response2 => {
@@ -109,7 +111,7 @@ const Summary = ({route, navigation}) => {
 
   const handleZoomAndCenter = coordinates => {
     mapRef.current.fitToCoordinates(coordinates, {
-      edgePadding: {top: 50, right: 50, bottom: 50, left: 50},
+      edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
       animated: true,
     });
   };
@@ -159,16 +161,18 @@ const Summary = ({route, navigation}) => {
         '¡Llegaste a destino!',
         summary.price
           ? 'Asegurate de dar a quien te ofreció el lugar su propina correspondiente de ' +
-              summary.currency +
-              ' ' +
-              summary.price
+          summary.currency +
+          ' ' +
+          summary.price
           : summary.price
-          ? 'Tu pago ya fue efectuado. ¡Muchas gracias!'
-          : 'Gracias por utilizar nuestra aplicación. Esperamos que te haya sido de utilidad.',
+            ? 'Tu pago ya fue efectuado. ¡Muchas gracias!'
+            : 'Gracias por utilizar nuestra aplicación. Esperamos que te haya sido de utilidad.',
         null,
-        !preference ? 'alert' : null,
+        'alert',
         () => {
-          navigation.navigate('Home');
+          if (!summaryMatch.preferenceId) {
+            navigation.navigate('Home');
+          };
         },
       );
     };
@@ -217,7 +221,7 @@ const Summary = ({route, navigation}) => {
 
       // Get user's current location
       positionHandler(
-        ({coords}) => {
+        ({ coords }) => {
           console.log('Getting location');
           Geocoder.from(coords).then(json => {
             var location = json.results[0].formatted_address;
@@ -247,7 +251,7 @@ const Summary = ({route, navigation}) => {
           });
         },
         error => console.error(error),
-        {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
       );
 
       return () => {
@@ -282,7 +286,7 @@ const Summary = ({route, navigation}) => {
         'alert',
         null,
         [
-          {text: 'CANCELAR', onPress: () => null},
+          { text: 'CANCELAR', onPress: () => null },
           {
             text: 'CONFIRMAR',
             onPress: async () => {
@@ -309,14 +313,14 @@ const Summary = ({route, navigation}) => {
       showNotification(
         '¡No te vayas sin pagar!',
         'El otro usuario está esperando que le deposites su propina de ' +
-          summary.currency +
-          ' ' +
-          summary.price +
-          '. Depositá tu pago rápidamente desde el botón "PAGAR"',
+        summary.currency +
+        ' ' +
+        summary.price +
+        '. Depositá tu pago rápidamente desde el botón "PAGAR"',
         null,
         'alert',
         null,
-        [{text: 'ACEPTAR', onPress: () => null}],
+        [{ text: 'ACEPTAR', onPress: () => null }],
       );
       return true;
     }
@@ -337,7 +341,7 @@ const Summary = ({route, navigation}) => {
   };
 
   const goToProfile = () => {
-    navigation.navigate('UserProfile', {profileUser: summary.userId});
+    navigation.navigate('UserProfile', { profileUser: summary.userId });
   };
 
   if (loading) {
@@ -352,9 +356,9 @@ const Summary = ({route, navigation}) => {
             <View
               style={[
                 styles.container,
-                {padding: 20, display: 'grid', gap: 20},
+                { padding: 20, display: 'grid', gap: 20 },
               ]}>
-              <View style={[styles.section, {padding: 10}]}>
+              <View style={[styles.section, { padding: 10 }]}>
                 {isConfirmed ? (
                   <>
                     <View style={summaryStyles.imageContainer}>
@@ -365,7 +369,7 @@ const Summary = ({route, navigation}) => {
                         style={summaryStyles.image}
                       />
                     </View>
-                    <Text style={{textAlign: 'center', marginBottom: 20}}>
+                    <Text style={{ textAlign: 'center', marginBottom: 20 }}>
                       <Text style={styles.text}>
                         ¡Tu lugar para estacionar está esperandote!
                       </Text>
@@ -382,7 +386,7 @@ const Summary = ({route, navigation}) => {
                         style={summaryStyles.image}
                       />
                     </View>
-                    <Text style={{textAlign: 'center', marginBottom: 20}}>
+                    <Text style={{ textAlign: 'center', marginBottom: 20 }}>
                       <Text style={styles.text}>
                         El usuario rechazó tu solicitud o el lugar ya fue tomado
                         por otro conductor
@@ -392,11 +396,11 @@ const Summary = ({route, navigation}) => {
                 ) : null}
                 {!isConfirmed && !isCancelled ? (
                   <>
-                    <Text style={{...styles.text, textAlign: 'center'}}>
+                    <Text style={{ ...styles.text, textAlign: 'center' }}>
                       Esperando respuesta...
                     </Text>
                     <Loading
-                      style={{paddingVertical: 50}}
+                      style={{ paddingVertical: 50 }}
                       visible={!isConfirmed}
                       text={'Esperando confirmación...'}></Loading>
                   </>
@@ -406,7 +410,7 @@ const Summary = ({route, navigation}) => {
                   <TouchableOpacity
                     onPress={() => setOpen(!open)}
                     style={summaryStyles.dropdown}>
-                    <Text style={{...styles.sectionTitle}}>Tu resumen:</Text>
+                    <Text style={{ ...styles.sectionTitle }}>Tu resumen:</Text>
                     <Text style={styles.sectionTitle}>
                       {open ? '︿' : '﹀'}
                     </Text>
@@ -441,7 +445,7 @@ const Summary = ({route, navigation}) => {
                   </View>
 
                   {/* Map */}
-                  <View style={{position: 'relative'}}>
+                  <View style={{ position: 'relative' }}>
                     <MapView
                       ref={mapRef}
                       style={summaryStyles.map}
