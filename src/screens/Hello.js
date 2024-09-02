@@ -6,19 +6,29 @@ import { useFocusEffect } from "@react-navigation/native";
 
 const Hello = ({ isAuth, navigation }) => {
     const [next, setNext] = useState('Login');
+
     useFocusEffect(
         React.useCallback(() => {
-            if (isAuth == null) {
-                console.log('Waiting...')
-            } else {
-                console.log('Is auth? ', isAuth)
-                if (isAuth == false) {
-                    navigation.navigate('Login');
+            const checkAuthAndNavigate = () => {
+                if (isAuth == null) {
+                    console.log('Waiting...');
                 } else {
-                    navigation.navigate('Home');
-                    setNext('Home');
+                    if (isAuth === false) {
+                        navigation.navigate('Login');
+                    } else {
+                        navigation.navigate('Home');
+                        setNext('Home');
+                    }
                 }
-            }
+            };
+
+            // Set up an interval to keep checking every 3 seconds if navigation wasn't successful
+            const intervalId = setInterval(() => {
+                checkAuthAndNavigate();
+            }, 3000);
+
+            return () => clearInterval(intervalId); // Clear interval when component unmounts
+
         }, [isAuth])
     );
 

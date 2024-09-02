@@ -1,6 +1,7 @@
 import { Linking } from 'react-native';
 import Button from './Button';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
+import Config from 'react-native-config';
 
 const CheckoutPro = ({ preference }) => {
   const openUrl = async url => {
@@ -35,7 +36,7 @@ const CheckoutPro = ({ preference }) => {
     <Button
       title="&#128274; PAGAR"
       color="#4287F5"
-      onPress={() => openUrl(preference.response.response[process.env.MP_INIT_POINT])}
+      onPress={() => openUrl(preference.response.response[Config.MP_INIT_POINT])}
     />
   );
 };
