@@ -143,6 +143,10 @@ const Summary = ({ route, navigation }) => {
       setIsCancelled(takenMatchId === matchId);
     };
 
+    const handleCancelMatchError = () => {
+      showNotification('Error', 'No podes cancelar un intercambio ya realizado.', null);
+    };
+
     const handleDeletedPlace = placeId => {
       showNotification(
         'Lo sentimos...',
@@ -179,11 +183,13 @@ const Summary = ({ route, navigation }) => {
 
     if (summary && user) {
       socket.on('cancelledMatch_' + user._id, handleCancelMatch);
+      socket.on('cancelledMatchError_' + user._id, handleCancelMatchError);
       socket.on('takenMatch_' + user._id, handleTakenMatch); // A new match is saved in database
       socket.on('deletePlace_' + user._id, handleDeletedPlace);
       socket.on('matchFinished_' + user._id, handleFinishMatch);
       return () => {
         socket.off('cancelledMatch_' + user._id, handleCancelMatch);
+        socket.off('cancelledMatchError_' + user._id, handleCancelMatchError);
         socket.off('takenMatch_' + user._id, handleTakenMatch);
         socket.off('deletePlace_' + user._id, handleDeletedPlace);
         socket.off('matchFinished_' + user._id, handleFinishMatch);
