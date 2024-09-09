@@ -33,11 +33,18 @@ const ListView = ({ item, active, onPress, navigation, pre, style, leftButtonAct
               />
             </View>
             <View style={listViewStyles.description}>
+              <Text style={{...styles.text, ...styles.bold}}>
               {
                 item.userId ? 
-                <Text style={{...styles.text, ...styles.bold}}>{item.userId.firstName + ' ' + item.userId.lastName}</Text>:
-                <Text style={{...styles.text, ...styles.bold}}>{item.name}</Text>
+                item.userId.firstName + ' ' + item.userId.lastName :
+                item.name
               }
+              {' '}
+              {
+                item.status ?
+                <View style={[listViewStyles.status, { backgroundColor: item.statusColor || styles.color.secondary }]}><Text style={[styles.small, { color: '#fff'}]}>{item.status}</Text></View> : null
+              }
+              </Text>
               <Text style={{...styles.text, ...styles.small}}>{shortText(item.location, (maxLength || 35), active)}</Text>
             </View>
           </View>
@@ -89,6 +96,11 @@ const listViewStyles = StyleSheet.create({
     height: 60,
     margin:'auto',
     resizeMode: 'contain',
+  },
+  status: {
+    borderRadius:10,
+    paddingHorizontal: 10,
+    marginLeft: 10
   },
   description: {
     width:'60%'

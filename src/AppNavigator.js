@@ -98,7 +98,7 @@ const AppNavigator = ({ setLinking }) => {
       <Stack.Screen name="Selection" component={Selection} options={{ title: 'Confirmación' }} />
       <Stack.Screen name="Summary" component={Summary} options={{ title: 'Resumen' }} />
       <Stack.Screen name="Chats" component={ChatList} options={{ title: 'Chats' }} />
-      <Stack.Screen name="History" component={History} options={{ title: 'Mis Intercambios' }} />
+      <Stack.Screen name="History" component={History} options={({ route }) => ({ title: route.params.keyWord ? 'Mis ' + route.params.keyWord : 'Mis Intercambios' })} />
       <Stack.Screen name="Settings" component={Profile} options={{ title: 'Mi Perfil' }} />
       <Stack.Screen name="UserProfile" component={Profile} options={({ route }) => ({ title: route.params.profileUser.firstName + ' ' + route.params.profileUser.lastName })} />
       <Stack.Screen name="NewCar" component={NewCar} options={({ route }) => ({ title: route.params && route.params.carId ? 'Editar Auto' : 'Nuevo Auto' })} />

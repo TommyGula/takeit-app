@@ -8,6 +8,7 @@ import Storage from '../services/Storage';
 import Config from "react-native-config";
 import Logo from '../../assets/images/logo.png';
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import NotificationBubble from "./NotificationBubble";
 
 const defaultMenuItems = [
     {
@@ -89,23 +90,21 @@ const TapMenu = () => {
                     console.log(JSON.stringify(results[1].data.length))
                     console.log(JSON.stringify(results[2].data.length))
                     setCurrentConnections({
-                        Summary: results[0].data[0],
-                        NewPlace: results[1].data[0] | results[2].data[0]
+                        Pendientes: [...results[0].data, ...results[1].data, ...results[2].data]
                     });
-                } else {
-                    setCurrentConnections({});
-                };
-                if (results[0].data.length) {
                     setMenuItems([...defaultMenuItems, {
                         label: 'Pendientes',
-                        route: 'Summary',
+                        route: 'History',
                         icon: 'https://cdn-icons-png.flaticon.com/512/5063/5063764.png',
-                        params: (item) => {
-                            return ({
-                                matchId: item._id
-                            })
+                        params: () => {
+                            return {
+                                showOnly:(all) => all.filter((m) => !m.cancelled && !m.payed), 
+                                keyWord:'Pendientes'
+                            }
                         }
                     }])
+                } else {
+                    setCurrentConnections({});
                 };
             })
     };
@@ -188,7 +187,8 @@ const TapMenu = () => {
             <TouchableOpacity style={tapMenuStyles.button} onPress={() => setOpen(true)}>
                 {
                     Object.keys(currentConnections).length ?
-                        <Image style={tapMenuStyles.alert} source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1632/1632646.png' }}></Image>
+                        // <Image style={tapMenuStyles.alert} source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1632/1632646.png' }}></Image>
+                        <NotificationBubble n={Object.values(currentConnections).reduce((r,a) => r + a.length, 0)}></NotificationBubble>
                         : null
                 }
                 <Image style={tapMenuStyles.icon} source={{ uri: 'https://cdn-icons-png.flaticon.com/256/1215/1215141.png' }}></Image>
@@ -210,18 +210,19 @@ const TapMenu = () => {
                 <View style={{ paddingVertical: 20 }}>
                     {
                         menuItems.map((item, i) => {
-                            const itemParams = item.params && Object.keys(currentConnections).includes(item.route) && item.params(currentConnections[item.route]);
+                            const itemParams = item.params && Object.keys(currentConnections).includes(item.route) && item.params(currentConnections[item.route][0]);
 
                             if (item.protected && currUser && !currUser.email.includes('gula')) return;
 
                             return (
-                                <TapMenuItem onPress={() => navigation.navigate(item.route, (itemParams ? itemParams : {}))} key={i} open={open} duration={500} delayOpen={500 + (100 * i)} delayClose={0 + (50 * (menuItems.length - 1 - i))}>
+                                <TapMenuItem onPress={() => navigation.navigate(item.route, {itemParams})} key={i} open={open} duration={500} delayOpen={500 + (100 * i)} delayClose={0 + (50 * (menuItems.length - 1 - i))}>
                                     <View style={tapMenuStyles.item}>
                                         <View style={tapMenuStyles.itemIcon}>
                                             <Image style={tapMenuStyles.icon} source={{ uri: item.icon }}></Image>
                                             {
-                                                Object.keys(currentConnections).includes(item.route) && currentConnections[item.route] ?
-                                                    <Image style={[tapMenuStyles.alert, { marginTop: 2 }]} source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1632/1632646.png' }}></Image> :
+                                                Object.keys(currentConnections).includes(item.label) && currentConnections[item.label] && currentConnections[item.label].length ?
+                                                    // <Image style={[tapMenuStyles.alert, { marginTop: 2 }]} source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1632/1632646.png' }}></Image> :
+                                                    <NotificationBubble n={currentConnections[item.label].length}></NotificationBubble> :
                                                     null
                                             }
                                         </View>
@@ -269,14 +270,6 @@ const tapMenuStyles = StyleSheet.create({
     logo: {
         height: '100%',
         width: '100%',
-    },
-    alert: {
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        width: 15,
-        height: 15,
-        zIndex: 2
     },
     item: {
         flexDirection: 'row',

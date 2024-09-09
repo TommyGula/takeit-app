@@ -16,7 +16,7 @@ const Loading = ({ visible, text, style=null }) => {
     <Animated.View style={[(style || styles.container), { transform: [{ translateY }] }]}>
       <View style={styles.innerContainer}>
         <ActivityIndicator size="large" color={colors.primary.main} />
-        <Text style={styles.text}>{text ? text : 'Loading...'}</Text>
+        <Text style={styles.text}>{text ? text : 'Cargando...'}</Text>
       </View>
     </Animated.View>
   );

@@ -8,7 +8,8 @@ import Loading from "./Loading";
 import { useNotification } from "../NotificationProvider";
 import ListView from "../components/ListView";
 
-const History = ({ navigation }) => {
+const History = ({ navigation, route }) => {
+    const keyWord = route.params.keyWord || 'Intercambios';
     const [matchesAsBuyer, setMatchesAsBuyer] = useState(null);
     const [matchesAsSeller, setMatchesAsSeller] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -35,8 +36,8 @@ const History = ({ navigation }) => {
         promises
             .then(response => {
                 if (response.length) {
-                    setMatchesAsBuyer(response[0].data);
-                    setMatchesAsSeller(response[1].data);
+                    setMatchesAsBuyer(route.params.showOnly ? route.params.showOnly(response[0].data) : response[0].data);
+                    setMatchesAsSeller(route.params.showOnly ? route.params.showOnly(response[1].data) : response[1].data);
                 } else {
                     showNotification('Error', response.message);
                 }
@@ -61,10 +62,12 @@ const History = ({ navigation }) => {
                     <>
                         <View style={styles.scrollViewContainer}>
                             <ScrollView vertical showsVerticalScrollIndicator={false} style={[styles.scrollView, { height: '100%' }]}>
-                                <Text style={[styles.sectionTitle, { paddingHorizontal: 20, marginTop: 20 }]}>Intercambios realizados</Text>
+                                <Text style={[styles.sectionTitle, { paddingHorizontal: 20, marginTop: 20 }]}>{keyWord} buscados</Text>
                                 {matchesAsBuyer.filter(m => m.parkingId).map((match, i) => { // nearByUsers will be the fetched data of type "parking"
                                     match['name'] = match.sellerId.firstName + ' ' + match.sellerId.lastName;
                                     match['location'] = match.location;
+                                    match['status'] = match.cancelled ? 'Cancelado' : match.payed ? 'Completado' : 'Pendiente';
+                                    match['statusColor'] = match.status === 'Completado' ? 'green' : match.status === 'Pendiente' ? '#FFA500' : 'red';
                                     return (
                                         // The card will show the price, the user picture and pictures if there are
                                         <ListView style={{ paddingHorizontal: 20 }} pre='$ ' key={i} item={match} navigation={navigation} onPress={() => navigation.navigate('Summary', { matchId: match._id })}></ListView>
@@ -72,14 +75,16 @@ const History = ({ navigation }) => {
                                 })}
                                 {
                                     !matchesAsBuyer.length ?
-                                        <View style={{ paddingHorizontal: 20 }}>
-                                            <Text style={styles.text}>No tenés ningún intercambio realizado en el momento</Text>
+                                        <View style={{ padding: 20, paddingTop: 0 }}>
+                                            <Text style={styles.text}>No tenés ningún intercambio buscado en el momento</Text>
                                         </View> : null
                                 }
-                                <Text style={[styles.sectionTitle, { paddingHorizontal: 20, marginTop: 20 }]}>Intercambios ofrecidos</Text>
+                                <Text style={[styles.sectionTitle, { paddingHorizontal: 20, marginTop: 20 }]}>{keyWord} ofrecidos</Text>
                                 {matchesAsSeller.filter(m => m.parkingId).map((match, i) => { // nearByUsers will be the fetched data of type "parking"
                                     match['name'] = match.sellerId.firstName + ' ' + match.sellerId.lastName;
                                     match['location'] = match.location;
+                                    match['status'] = match.cancelled ? 'Cancelado' : match.payed ? 'Completado' : 'Pendiente';
+                                    match['statusColor'] = match.status === 'Completado' ? 'green' : match.status === 'Pendiente' ? '#FFA500' : 'red';
                                     return (
                                         // The card will show the price, the user picture and pictures if there are
                                         <ListView style={{ paddingHorizontal: 20 }} pre='$ ' key={i} item={match} navigation={navigation} onPress={() => navigation.navigate('Summary', { matchId: match._id })}></ListView>
@@ -87,7 +92,7 @@ const History = ({ navigation }) => {
                                 })}
                                 {
                                     !matchesAsSeller.length ?
-                                        <View style={{ paddingHorizontal: 20 }}>
+                                        <View style={{ padding: 20, paddingTop: 0 }}>
                                             <Text style={styles.text}>No tenés ningún intercambio ofrecido en el momento</Text>
                                         </View> : null
                                 }
