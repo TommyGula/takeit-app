@@ -26,6 +26,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 
 // Styles
 import { styles } from './styles/global';
+import History from './screens/History';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -97,6 +98,7 @@ const AppNavigator = ({ setLinking }) => {
       <Stack.Screen name="Selection" component={Selection} options={{ title: 'Confirmación' }} />
       <Stack.Screen name="Summary" component={Summary} options={{ title: 'Resumen' }} />
       <Stack.Screen name="Chats" component={ChatList} options={{ title: 'Chats' }} />
+      <Stack.Screen name="History" component={History} options={{ title: 'Mis Intercambios' }} />
       <Stack.Screen name="Settings" component={Profile} options={{ title: 'Mi Perfil' }} />
       <Stack.Screen name="UserProfile" component={Profile} options={({ route }) => ({ title: route.params.profileUser.firstName + ' ' + route.params.profileUser.lastName })} />
       <Stack.Screen name="NewCar" component={NewCar} options={({ route }) => ({ title: route.params && route.params.carId ? 'Editar Auto' : 'Nuevo Auto' })} />

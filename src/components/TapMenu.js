@@ -21,7 +21,7 @@ const defaultMenuItems = [
         icon: 'https://cdn-icons-png.flaticon.com/512/566/566718.png'
     },
     {
-        label: 'Mi Historial',
+        label: 'Mis Intercambios',
         route: 'History',
         icon: 'https://cdn-icons-png.flaticon.com/512/5582/5582302.png'
     },
