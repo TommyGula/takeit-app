@@ -2,8 +2,21 @@ import { Linking } from 'react-native';
 import Button from './Button';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import Config from 'react-native-config';
+import mercadopago from '../utils/mercadopago';
+import { useState } from 'react';
 
 const CheckoutPro = ({ preference }) => {
+  const [show, setShow] = useState(true);
+  const handlePay = async () => {
+    const paymentExists = await mercadopago.payments.find(preference.external_reference);
+    if (paymentExists && paymentExists.data && paymentExists.data.results && paymentExists.data.results.length) {
+      setShow(false);
+    } else {
+      console.log('Payment does not exist');
+      openUrl(preference.response.response[Config.MP_INIT_POINT])
+    }
+  };
+
   const openUrl = async url => {
     if (await InAppBrowser.isAvailable()) {
       InAppBrowser.open(url, {
@@ -33,11 +46,16 @@ const CheckoutPro = ({ preference }) => {
     }
   };
   return (
-    <Button
-      title="&#128274; PAGAR"
-      color="#4287F5"
-      onPress={() => openUrl(preference.response.response[Config.MP_INIT_POINT])}
-    />
+    <>
+      {
+        show ?
+        <Button
+          title="&#128274; PAGAR"
+          color="#4287F5"
+          onPress={handlePay}
+        /> : null
+      }
+    </>
   );
 };
 export default CheckoutPro;

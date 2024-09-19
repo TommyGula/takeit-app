@@ -68,9 +68,7 @@ const AppNavigator = ({ setLinking }) => {
       config: {
         screens: {
           Settings: 'profile',
-          PaymentSuccess: 'paymentsuccess',
-          PaymentError: 'paymenterror',
-          PaymentPending: 'paymentpending',
+          Summary: 'summary',
         },
       },
     })
@@ -108,9 +106,9 @@ const AppNavigator = ({ setLinking }) => {
       <Stack.Screen name="LivePlace" component={LivePlace} options={{ title: 'Búsqueda', headerShown: false }} />
       <Stack.Screen name="Chat" component={Chat} options={({ route }) => ({ title: route.params.userName })} />
       <Stack.Screen name="Logout" component={Logout} options={{ title: 'Logout' }} initialParams={{ setIsAuth: setIsAuth }} />
-      <Stack.Screen name="PaymentSuccess" component={Payment} options={{ title: 'Pago Exitoso' }} initialParams={{ status: 'success' }} />
+      {/* <Stack.Screen name="PaymentSuccess" component={Payment} options={{ title: 'Pago Exitoso' }} initialParams={{ status: 'success' }} />
       <Stack.Screen name="PaymentError" component={Payment} options={{ title: 'Pago Fallido' }} initialParams={{ status: 'error' }} />
-      <Stack.Screen name="PaymentPending" component={Payment} options={{ title: 'Pago Pendiente' }} initialParams={{ status: 'pending' }} />
+      <Stack.Screen name="PaymentPending" component={Payment} options={{ title: 'Pago Pendiente' }} initialParams={{ status: 'pending' }} /> */}
       <Stack.Screen
         name="Login"
         component={Login}
