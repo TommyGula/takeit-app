@@ -5,11 +5,10 @@ import Config from 'react-native-config';
 import mercadopago from '../utils/mercadopago';
 import { useState } from 'react';
 
-const CheckoutPro = ({ preference }) => {
+const CheckoutPro = ({ preference, payment }) => {
   const [show, setShow] = useState(true);
   const handlePay = async () => {
-    const paymentExists = await mercadopago.payments.find(preference.external_reference);
-    if (paymentExists && paymentExists.data && paymentExists.data.results && paymentExists.data.results.length) {
+    if (payment) {
       setShow(false);
     } else {
       console.log('Payment does not exist');
@@ -53,6 +52,7 @@ const CheckoutPro = ({ preference }) => {
           title="&#128274; PAGAR"
           color="#4287F5"
           onPress={handlePay}
+          style={{display: payment ? 'none' : 'block'}}
         /> : null
       }
     </>

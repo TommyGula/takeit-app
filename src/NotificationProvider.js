@@ -8,7 +8,7 @@ import axios from './utils/axios';
 
 const NotificationContext = createContext();
 
-export const NotificationProvider = ({ children, screen }) => {
+export const NotificationProvider = ({ children, screen, initialMessage }) => {
   const [notification, setNotification] = useState(null);
   const [socketOn, setSocketOn] = useState(false);
 
@@ -17,6 +17,10 @@ export const NotificationProvider = ({ children, screen }) => {
   useEffect(() => {
     screenRef.current = screen;
   }, [screen]);
+
+  useEffect(() => {
+    if (initialMessage) showNotification('Message', initialMessage, null, 'alert');
+  }, [initialMessage]);
 
   const showNotification = (title, message, duration=3000, type = 'snackbar', callback = null, buttons = null, cancelable = true, onDismiss = () => null, routes) => {
     if (routes && routes.take && !routes.take.includes(screenRef.current)) {

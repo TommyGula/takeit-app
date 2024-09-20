@@ -9,6 +9,7 @@ import {
   BackHandler,
   Linking,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { styles, colors } from '../styles/global';
 import ParkIcon from '../../assets/icons/park.png';
 import MeIcon from '../../assets/icons/me.png';
@@ -41,6 +42,7 @@ const Summary = ({ route, navigation }) => {
   const [isCancelled, setIsCancelled] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [preference, setPreference] = useState(null);
+  const [payment, setPayment] = useState(null);
 
   const { showNotification } = useNotification();
 
@@ -268,6 +270,23 @@ const Summary = ({ route, navigation }) => {
     getLocation();
   }, []);
 
+  const getPaymentData = () => {
+    axios.get('payments?preferenceId=' + preference._id)
+    .then(response => {
+      if (response.data && response.data.length) {
+        setPayment(response.data[0]);
+      }
+    });
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (preference) {
+        getPaymentData();
+      }
+    })
+  );
+
   const initNavegation = () => {
     const item = summary;
     const url = `https://www.google.com/maps/dir/?api=1&origin=${region.latitude},${region.longitude}&destination=${item.latitude},${item.longitude}`;
@@ -432,7 +451,7 @@ const Summary = ({ route, navigation }) => {
                 <>
                   {/* Go to chat or to profile */}
                   {preference && isConfirmed ? (
-                    <CheckoutPro preference={preference}></CheckoutPro>
+                    <CheckoutPro preference={preference} payment={payment}></CheckoutPro>
                   ) : null}
                   <View
                     style={{

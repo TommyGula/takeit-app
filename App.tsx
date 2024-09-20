@@ -9,6 +9,7 @@ const App = () => {
   const navRef = useNavigationContainerRef();
   const [current, setCurrent] = useState<string | null>(null);
   const [linking, setLinking] = useState(null);
+  const [initialMessage, setInitialMessage] = useState(null);
 
   useEffect(() => {
     const handleDeepLink = (event: any) => {
@@ -43,8 +44,8 @@ const App = () => {
 
   return (
     <NavigationContainer ref={navRef} onStateChange={onScreenChange} {...(linking ? { linking } : {})} >
-      <NotificationProvider screen={current}>
-        <AppNavigator setLinking={setLinking}/>
+      <NotificationProvider screen={current} initialMessage={initialMessage}>
+        <AppNavigator setLinking={setLinking} setInitialMessage={setInitialMessage}/>
       </NotificationProvider>
     </NavigationContainer>
   );

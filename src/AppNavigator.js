@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import NetInfo from '@react-native-community/netinfo';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { Linking } from 'react-native';
 
 // Screens
 import Home from './screens/Home';
@@ -31,10 +32,52 @@ import History from './screens/History';
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
-const AppNavigator = ({ setLinking }) => {
+const AppNavigator = ({ setLinking, setInitialMessage }) => {
   const navigation = useNavigation();
   const [isAuth, setIsAuth] = useState(null);
   const [isConnected, setIsConnected] = useState(true);
+
+  const handleDeepLink = (url) => {
+    const params = extractQueryParams(url);
+
+    if (params) {
+      const { message } = params;
+      if (message) {
+        setInitialMessage(decodeURIComponent(message)); // Decode the message
+      } else setInitialMessage(null);
+    } else setInitialMessage(null);
+  };
+
+  const extractQueryParams = (url) => {
+    const queryString = url.split('?')[1];
+    if (!queryString) return null;
+
+    const params = queryString.split('&').reduce((acc, param) => {
+      const [key, value] = param.split('=');
+      acc[key] = value;
+      return acc;
+    }, {});
+
+    return params;
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      Linking.getInitialURL().then((url) => {
+        if (url) {
+          handleDeepLink(url);
+        }
+      });
+  
+      const subscription = Linking.addEventListener('url', (event) => {
+        handleDeepLink(event.url);
+      });
+
+      return () => {
+        subscription.remove();
+      };
+    }, [])
+  );
 
   useEffect(() => {
     checkAuthentication();
