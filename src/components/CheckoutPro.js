@@ -2,7 +2,6 @@ import { Linking } from 'react-native';
 import Button from './Button';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import Config from 'react-native-config';
-import mercadopago from '../utils/mercadopago';
 import { useState } from 'react';
 
 const CheckoutPro = ({ preference, payment }) => {
@@ -48,12 +47,12 @@ const CheckoutPro = ({ preference, payment }) => {
     <>
       {
         show ?
-        <Button
-          title="&#128274; PAGAR"
-          color="#4287F5"
-          onPress={handlePay}
-          style={{display: payment ? 'none' : 'block'}}
-        /> : null
+          <Button
+            title="&#128274; PAGAR"
+            color="#4287F5"
+            onPress={handlePay}
+            style={{ display: payment ? 'none' : 'block' }}
+          /> : null
       }
     </>
   );
