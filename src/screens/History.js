@@ -87,7 +87,7 @@ const History = ({ navigation, route }) => {
                                     match['statusColor'] = match.status === 'Completado' ? 'green' : match.status === 'Pendiente' ? '#FFA500' : 'red';
                                     return (
                                         // The card will show the price, the user picture and pictures if there are
-                                        <ListView style={{ paddingHorizontal: 20 }} pre='$ ' key={i} item={match} navigation={navigation} onPress={() => navigation.navigate('Summary', { matchId: match._id })}></ListView>
+                                        <ListView style={{ paddingHorizontal: 20 }} pre='$ ' key={i} item={match} navigation={navigation} onPress={() => navigation.navigate('LivePlace', { matchId: match._id })}></ListView>
                                     )
                                 })}
                                 {
