@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Animated, PanResponder, StyleSheet, Platform } from 'react-native';
-import {WINDOW_HEIGHT} from '../utils/helpers';
+import { WINDOW_HEIGHT } from '../utils/helpers';
 
 const DraggableBottomSheet = ({ children, open, selected, isStatic = false, maxHeight = null, minHeight = null, setOpen }) => {
-  const BOTTOM_SHEET_MAX_HEIGHT = maxHeight || WINDOW_HEIGHT;
+  const BOTTOM_SHEET_MAX_HEIGHT = maxHeight || WINDOW_HEIGHT * 0.90;
   const BOTTOM_SHEET_MIN_HEIGHT = minHeight || WINDOW_HEIGHT * 0.04;
   const SEMI_OPEN_HEIGHT = BOTTOM_SHEET_MAX_HEIGHT * 0.4;
 
@@ -62,8 +62,11 @@ const DraggableBottomSheet = ({ children, open, selected, isStatic = false, maxH
     if (current !== selected || isStatic) {
       setCurrent(selected);
     };
-    springAnimation('semi');
   }, [open, selected, isStatic]);
+
+  useEffect(() => {
+    springAnimation('semi'); // When it just opens
+  }, []);
 
   const springAnimation = (direction) => {
     let toValue;

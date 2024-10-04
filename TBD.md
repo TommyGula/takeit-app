@@ -75,3 +75,4 @@ Al cargar, espera por el socket matchTaken. Si el usuario que envía en el param
 - [X] Crear pago con mercadopago
 - [X] Modificar utils/mercadopago.js y crear una api que traiga los medios de pago SEGUN EL USUARIO en lugar de llamar directamente a la api de MP
 - [X] Cambiar todos los scrollViewContainer por un componente que tenga un onLayout y cambie de altura dependiendo de la altura de su child
+- [] Hacer que cuando se recive un mensaje nuevo solo lo marque como read: true si el que lo leé es el recipiente, no el remitente.

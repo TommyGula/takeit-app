@@ -5,7 +5,7 @@ import TapMenuItem from "./TapMenuItem";
 import Divider from "./Divider";
 import axios from '../utils/axios';
 import Storage from '../services/Storage';
-import Config from "react-native-config";
+import socket from '../services/SocketIO';
 import Logo from '../../assets/images/logo.png';
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import NotificationBubble from "./NotificationBubble";
@@ -43,24 +43,24 @@ const defaultMenuItems = [
         route: 'Logout',
         icon: 'https://cdn-icons-png.flaticon.com/512/59/59399.png'
     },
-    {
-        label: 'Admin: Pago Exitoso',
-        route: 'PaymentSuccess',
-        protected: true,
-        icon: 'https://cdn-icons-png.flaticon.com/512/1388/1388990.png'
-    },
-    {
-        label: 'Admin: Pago Fallido',
-        route: 'PaymentError',
-        protected: true,
-        icon: 'https://cdn-icons-png.flaticon.com/512/1388/1388990.png'
-    },
-    {
-        label: 'Admin: Pago Pendiente',
-        route: 'PaymentPending',
-        protected: true,
-        icon: 'https://cdn-icons-png.flaticon.com/512/1388/1388990.png'
-    }
+    /*     {
+            label: 'Admin: Pago Exitoso',
+            route: 'PaymentSuccess',
+            protected: true,
+            icon: 'https://cdn-icons-png.flaticon.com/512/1388/1388990.png'
+        },
+        {
+            label: 'Admin: Pago Fallido',
+            route: 'PaymentError',
+            protected: true,
+            icon: 'https://cdn-icons-png.flaticon.com/512/1388/1388990.png'
+        },
+        {
+            label: 'Admin: Pago Pendiente',
+            route: 'PaymentPending',
+            protected: true,
+            icon: 'https://cdn-icons-png.flaticon.com/512/1388/1388990.png'
+        } */
 ];
 
 const TapMenu = () => {
@@ -75,22 +75,38 @@ const TapMenu = () => {
         const token = await Storage.get('auth_token');
         const u = await Storage.get('user');
         const user = JSON.parse(u);
-        console.log(user)
 
         setCurrUser(user);
-        const isBuyer = axios.get('matches?cancelled=false&payed=false&buyerId=' + user._id, token);
-        const isSeller = axios.get('matches?cancelled=false&payed=false&sellerId=' + user._id, token);
-        const isNewPlace = axios.get('places?taken=false&userId=' + user._id, token)
-        Promise.all([isBuyer, isSeller, isNewPlace])
+        const isBuyer = axios.get('matches?cancelled=false&finished=false&buyerId=' + user._id, token);
+        const isSeller = axios.get('matches?cancelled=false&finished=true&sellerId=' + user._id, token);
+        const isNewPlace = axios.get('places?includeTaken=true&userId=' + user._id, token);
+        const unreadChats = axios.get('chats/user/' + user._id, token);
+
+        Promise.all([isBuyer, isSeller, isNewPlace, unreadChats])
             .then(results => {
                 // console.log('Buyer connections ' + results[0].data.length);
                 // console.log('Seller connections ' + results[1].data.length);
-                if (results[0].data.length || results[1].data.length || results[2].data.length) {
+                results[2].data = results[2].data.reduce((r, a) => {
+                    const placeFinishedMatches = results[1].data.filter(m => m.parkingId == a._id);
+                    if (!placeFinishedMatches.length) {
+                        r.push(a);
+                    };
+                    return r;
+                }, []);
+                results[3].data = results[3].data.reduce((r, a) => {
+                    if (a.hasUnread) {
+                        r.push(a);
+                        return r;
+                    } else {
+                        return r;
+                    }
+                }, []);
+                if (results[0].data.length || results[2].data.length || results[3].data.length) {
                     console.log(JSON.stringify(results[0].data.length))
-                    console.log(JSON.stringify(results[1].data.length))
                     console.log(JSON.stringify(results[2].data.length))
                     setCurrentConnections({
-                        Pendientes: [...results[0].data, ...results[1].data, ...results[2].data]
+                        Pendientes: [...results[0].data, ...results[2].data],
+                        'Mis Chats': results[3].data
                     });
                     setMenuItems([...defaultMenuItems, {
                         label: 'Pendientes',
@@ -98,8 +114,8 @@ const TapMenu = () => {
                         icon: 'https://cdn-icons-png.flaticon.com/512/5063/5063764.png',
                         params: () => {
                             return {
-                                showOnly:(all) => all.filter((m) => !m.cancelled && !m.payed), 
-                                keyWord:'Pendientes'
+                                showOnlyAsBuyer: (all) => all.filter((m) => !m.cancelled && !m.payed),
+                                keyWord: 'Pendientes'
                             }
                         }
                     }])
@@ -108,6 +124,15 @@ const TapMenu = () => {
                 };
             })
     };
+
+    useEffect(() => {
+        if (currUser) {
+            socket.on('receivedMessage_' + currUser._id, getCurrentConnections);
+            return () => {
+                socket.off('receivedMessage_' + currUser._id, getCurrentConnections);
+            };
+        };
+    }, [currUser]);
 
     const handlers = {
         overlay: {
@@ -188,7 +213,7 @@ const TapMenu = () => {
                 {
                     Object.keys(currentConnections).length ?
                         // <Image style={tapMenuStyles.alert} source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1632/1632646.png' }}></Image>
-                        <NotificationBubble n={Object.values(currentConnections).reduce((r,a) => r + a.length, 0)}></NotificationBubble>
+                        <NotificationBubble n={Object.values(currentConnections).reduce((r, a) => r + a.length, 0)}></NotificationBubble>
                         : null
                 }
                 <Image style={tapMenuStyles.icon} source={{ uri: 'https://cdn-icons-png.flaticon.com/256/1215/1215141.png' }}></Image>
@@ -202,7 +227,7 @@ const TapMenu = () => {
                 <TouchableOpacity style={tapMenuStyles.close} onPress={() => setOpen(false)}>
                     <Text style={[styles.text, { textAlign: 'center' }]}>X</Text>
                 </TouchableOpacity>
-                <View style={{ marginBottom: 0 }}>
+                <View style={{ marginBottom: 20 }}>
                     <Text style={styles.sectionTitle}>¡Hola {currUser ? currUser.firstName : ''}!</Text>
                     <Text style={styles.text}>¿Qué estás buscando hoy?</Text>
                 </View>
@@ -215,7 +240,7 @@ const TapMenu = () => {
                             if (item.protected && currUser && !currUser.email.includes('gula')) return;
 
                             return (
-                                <TapMenuItem onPress={() => navigation.navigate(item.route, {itemParams})} key={i} open={open} duration={500} delayOpen={500 + (100 * i)} delayClose={0 + (50 * (menuItems.length - 1 - i))}>
+                                <TapMenuItem onPress={() => navigation.navigate(item.route, { itemParams })} key={i} open={open} duration={500} delayOpen={500 + (100 * i)} delayClose={0 + (50 * (menuItems.length - 1 - i))}>
                                     <View style={tapMenuStyles.item}>
                                         <View style={tapMenuStyles.itemIcon}>
                                             <Image style={tapMenuStyles.icon} source={{ uri: item.icon }}></Image>

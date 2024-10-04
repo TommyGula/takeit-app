@@ -5,6 +5,8 @@
   "scripts": {
     "android:a20": "start adb -s R58M46SHQLY reverse tcp:3000 tcp:3000 && react-native run-android",
     "android:a20s": "start adb -s R9MMC06P4WJ reverse tcp:3000 tcp:3000 && react-native run-android",
+    "android:emulator:5554": "start adb -s emulator-5554 reverse tcp:3000 tcp:3000 && react-native run-android",
+    "android:emulator:5556": "start adb -s emulator-5556 reverse tcp:3000 tcp:3000 && react-native run-android",
     "android:xiaomi": "start adb -s 53e6eb1cd897 reverse tcp:3000 tcp:3000 && react-native run-android",
     "android:install:a20": "cd android && gradlew assembleRelease && adb -s R58M46SHQLY install -r app\\build\\outputs\\apk\\release\\app-release.apk && cd ..",
     "android:install:a20s": "cd android && gradlew assembleRelease && adb -s R9MMC06P4WJ install -r app\\build\\outputs\\apk\\release\\app-release.apk && cd ..",

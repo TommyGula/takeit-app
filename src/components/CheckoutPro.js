@@ -2,7 +2,7 @@ import { Linking } from 'react-native';
 import Button from './Button';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import Config from 'react-native-config';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const CheckoutPro = ({ preference, payment }) => {
   const [show, setShow] = useState(true);
@@ -14,6 +14,11 @@ const CheckoutPro = ({ preference, payment }) => {
       openUrl(preference.response.response[Config.MP_INIT_POINT])
     }
   };
+
+  useEffect(() => {
+    console.log('Is payment? ', payment)
+    if (payment) setShow(false);
+  }, [payment]);
 
   const openUrl = async url => {
     if (await InAppBrowser.isAvailable()) {

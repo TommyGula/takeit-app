@@ -17,55 +17,57 @@ const ListView = ({ item, active, onPress, navigation, pre, style, leftButtonAct
 
   useEffect(() => {
     if (active && position) {
-      onPress(position);
+      //onPress(position);
     };
   }, [position]);
 
   return (
     <TouchableWithoutFeedback onPress={() => onPress(position)}>
-      <View ref={ref} onLayout={() => handleLayout(ref, (pos) => setPosition(pos))} style={[(active ? listViewStyles.itemCardActive : {}), listViewStyles.itemCard, style]}>
-        <View style={{...listViewStyles.itemCardContent, justifyContent:'space-between'}}>
-          <View style={{...listViewStyles.itemCardContent}}>
-            <View style={listViewStyles.imageContainer}>
-              <Image
-                source={{ uri: (item.image || 'https://freeiconshop.com/wp-content/uploads/edd/car-flat.png') }}
-                style={listViewStyles.image}
-              />
+      <View ref={ref} onLayout={() => handleLayout(ref, (pos) => setPosition(pos))} style={[(active ? listViewStyles.itemCardActive : {}), style]}>
+        <View style={listViewStyles.itemCard}>
+          <View style={{ ...listViewStyles.itemCardContent, justifyContent: 'space-between' }}>
+            <View style={{ ...listViewStyles.itemCardContent }}>
+              <View style={listViewStyles.imageContainer}>
+                <Image
+                  source={{ uri: (item.image || 'https://freeiconshop.com/wp-content/uploads/edd/car-flat.png') }}
+                  style={listViewStyles.image}
+                />
+              </View>
+              <View style={listViewStyles.description}>
+                <Text style={{ ...styles.text, ...styles.bold }}>
+                  {
+                    item.userId ?
+                      item.userId.firstName + ' ' + item.userId.lastName :
+                      item.name
+                  }
+                  {' '}
+                  {
+                    item.status ?
+                      <View style={[listViewStyles.status, { backgroundColor: item.statusColor || styles.color.secondary }]}><Text style={[styles.small, { color: '#fff' }]}>{item.status}</Text></View> : null
+                  }
+                </Text>
+                <Text style={{ ...styles.text, ...styles.small }}>{shortText(item.location, (maxLength || 35), active)}</Text>
+              </View>
             </View>
-            <View style={listViewStyles.description}>
-              <Text style={{...styles.text, ...styles.bold}}>
-              {
-                item.userId ? 
-                item.userId.firstName + ' ' + item.userId.lastName :
-                item.name
-              }
-              {' '}
-              {
-                item.status ?
-                <View style={[listViewStyles.status, { backgroundColor: item.statusColor || styles.color.secondary }]}><Text style={[styles.small, { color: '#fff'}]}>{item.status}</Text></View> : null
-              }
-              </Text>
-              <Text style={{...styles.text, ...styles.small}}>{shortText(item.location, (maxLength || 35), active)}</Text>
-            </View>
-          </View>
-          <View style={listViewStyles.price}>
+            <View style={listViewStyles.price}>
               {
                 item.price ?
-                <Text style={{...styles.text}}>{pre}{item.price}</Text> : null
+                  <Text style={{ ...styles.text }}>{pre}{item.price}</Text> : null
               }
               {
                 item.link ?
-                <Text style={{...styles.text, ...styles.small, ...{color:colors.secondary.main, textAlign:'right'}}}>{item.linkLabel || 'más info'}</Text> : null
+                  <Text style={{ ...styles.text, ...styles.small, ...{ color: colors.secondary.main, textAlign: 'right' } }}>{item.linkLabel || 'más info'}</Text> : null
               }
             </View>
-        </View>
-        {
-          active &&
-          <View style={listViewStyles.ctaSection}>
-            <Button style={listViewStyles.cta} title={leftButtonLabel || 'Reservar'} onPress={leftButtonAction || handleBook} color={'secondary'}></Button>
-            <Button style={listViewStyles.cta} title={rightButtonLabel || 'Ver perfil'} onPress={rightButtonAction || handleGoToProfile} color={'secondary'}></Button>
           </View>
-        }
+          {
+            active &&
+            <View style={listViewStyles.ctaSection}>
+              <Button style={listViewStyles.cta} title={leftButtonLabel || 'Reservar'} onPress={leftButtonAction || handleBook} color={'secondary'}></Button>
+              <Button style={listViewStyles.cta} title={rightButtonLabel || 'Ver perfil'} onPress={rightButtonAction || handleGoToProfile} color={'secondary'}></Button>
+            </View>
+          }
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -74,6 +76,8 @@ const ListView = ({ item, active, onPress, navigation, pre, style, leftButtonAct
 const listViewStyles = StyleSheet.create({
   itemCard: {
     paddingVertical: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#c2c2c2'
   },
   itemCardActive: {
     backgroundColor: colors.primary.light,
@@ -87,36 +91,36 @@ const listViewStyles = StyleSheet.create({
   },
   imageContainer: {
     width: '20%',
-    flexDirection:'row',
-    justifyContent:'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
     marginRight: 20,
   },
   image: {
     width: '100%',
     height: 60,
-    margin:'auto',
+    margin: 'auto',
     resizeMode: 'contain',
   },
   status: {
-    borderRadius:10,
+    borderRadius: 10,
     paddingHorizontal: 10,
     marginLeft: 10
   },
   description: {
-    width:'60%'
+    width: '60%'
   },
   price: {
-    marginLeft:-20
+    marginLeft: -20
   },
   ctaSection: {
-    paddingTop:15,
+    paddingTop: 15,
     flexDirection: 'row', // Display children horizontally
     alignItems: 'center', // Align children vertically in the center
-    justifyContent: 'space-around', 
-    gap:30
+    justifyContent: 'space-around',
+    gap: 30
   },
   cta: {
-    width:'40%'
+    width: '40%'
   }
 });
 

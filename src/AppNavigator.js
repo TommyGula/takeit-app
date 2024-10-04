@@ -20,6 +20,7 @@ import Hello from './screens/Hello';
 import ConnError from './screens/ConnError';
 import AuthService from './services/AuthService';
 import Payment from './screens/Payment';
+import Error from './screens/Error';
 
 // Navigatior
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -68,7 +69,7 @@ const AppNavigator = ({ setLinking, setInitialMessage }) => {
           handleDeepLink(url);
         }
       });
-  
+
       const subscription = Linking.addEventListener('url', (event) => {
         handleDeepLink(event.url);
       });
@@ -111,7 +112,7 @@ const AppNavigator = ({ setLinking, setInitialMessage }) => {
       config: {
         screens: {
           Settings: 'profile',
-          Summary: 'summary',
+          Summary: 'summary:matchId',
         },
       },
     })
@@ -136,6 +137,7 @@ const AppNavigator = ({ setLinking, setInitialMessage }) => {
         {props => <Hello {...props} isAuth={isAuth} />}
       </Stack.Screen>
       <Stack.Screen name="Home" component={Home} options={{ title: 'Home', headerShown: false }} />
+      <Stack.Screen name="Error" component={Error} options={{ title: 'Error' }} />
       <Stack.Screen name="Selection" component={Selection} options={{ title: 'Confirmación' }} />
       <Stack.Screen name="Summary" component={Summary} options={{ title: 'Resumen' }} />
       <Stack.Screen name="Chats" component={ChatList} options={{ title: 'Chats' }} />
@@ -146,7 +148,7 @@ const AppNavigator = ({ setLinking, setInitialMessage }) => {
       <Stack.Screen name="ViewCar" component={NewCar} options={({ route }) => ({ title: route.params.carName })} />
       <Stack.Screen name="NewDocument" component={NewDocument} options={({ route }) => ({ title: route.params && route.params.docId && route.params.userId ? 'Ver Documento' : route.params && route.params.docId ? 'Editar Documento' : 'Nuevo Documento' })} />
       <Stack.Screen name="NewPlace" component={NewPlace} options={{ title: 'Iniciar Búsqueda' }} />
-      <Stack.Screen name="LivePlace" component={LivePlace} options={{ title: 'Búsqueda', headerShown: false }} />
+      <Stack.Screen name="LivePlace" component={LivePlace} options={{ title: 'Búsqueda', headerShown: true }} />
       <Stack.Screen name="Chat" component={Chat} options={({ route }) => ({ title: route.params.userName })} />
       <Stack.Screen name="Logout" component={Logout} options={{ title: 'Logout' }} initialParams={{ setIsAuth: setIsAuth }} />
       {/* <Stack.Screen name="PaymentSuccess" component={Payment} options={{ title: 'Pago Exitoso' }} initialParams={{ status: 'success' }} />

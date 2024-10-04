@@ -19,7 +19,7 @@ const Chat = ({ route, navigation }) => {
     const scrollViewRef = useRef(null);
 
     const scrollToBottom = () => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
+        scrollViewRef.current?.scrollToEnd({ animated: true });
     };
 
     const { showNotification } = useNotification();
@@ -29,13 +29,13 @@ const Chat = ({ route, navigation }) => {
             const profileUserId = chat.users.find(u => u != me._id);
             const profileUser = await axios.get('users/' + profileUserId);
             navigation.setOptions({
-              headerRight: () => (
-                <Button 
-                onPress={() => navigation.navigate('UserProfile', { profileUser: profileUser.data })} 
-                styleText={{fontSize:14}} color='primary'>
-                    Ver Perfil
-                </Button>
-              ),
+                headerRight: () => (
+                    <Button
+                        onPress={() => navigation.navigate('UserProfile', { profileUser: profileUser.data })}
+                        styleText={{ fontSize: 14 }} color='primary'>
+                        Ver Perfil
+                    </Button>
+                ),
             });
         }
         if (chat && me) {
@@ -46,17 +46,17 @@ const Chat = ({ route, navigation }) => {
     const handleMessageSubmit = async (text) => {
         const token = await Storage.get('auth_token');
         const newMessage = {
-            chatId:chatId,
-            senderId:me._id,
-            message:text
+            chatId: chatId,
+            senderId: me._id,
+            message: text
         };
         axios.post('messages', newMessage, token)
-        .then(response => {
-            scrollToBottom();
-        })
-        .catch(err => {
-            console.log('Error', err.message);
-        })
+            .then(response => {
+                scrollToBottom();
+            })
+            .catch(err => {
+                console.log('Error', err.message);
+            })
     };
 
     useEffect(() => {
@@ -66,25 +66,27 @@ const Chat = ({ route, navigation }) => {
         } else {
             getUser();
         };
-    },[me]);
+    }, [me]);
 
     useEffect(() => {
         const getNewMessage = async (newMessageId) => {
             const token = await Storage.get('auth_token');
             axios.get('messages/' + newMessageId, token)
-            .then(response => {
-                setMessages(prevMessages => [...prevMessages, response.data]);
-                axios.put('messages/' + newMessageId, {read:true}, token)
-                .then(updated => {
-                    
+                .then(response => {
+                    setMessages(prevMessages => [...prevMessages, response.data]);
+                    if (me._id != response.data.senderId) {
+                        axios.put('messages/' + newMessageId, { read: true }, token)
+                            .then(updated => {
+
+                            })
+                            .catch(err => {
+                                console.log(err)
+                            })
+                    }
                 })
                 .catch(err => {
                     console.log(err)
                 })
-            })
-            .catch(err => {
-                console.log(err)
-            })
         };
         if (me) {
             socket.on('newMessage_' + me._id, getNewMessage);
@@ -92,8 +94,8 @@ const Chat = ({ route, navigation }) => {
                 socket.off('newMessage_' + me._id, getNewMessage);
             };
         }
-    },[me]);
-        
+    }, [me]);
+
     const getUser = async () => {
         const getMe = await Storage.get('user');
         setMe(JSON.parse(getMe));
@@ -102,47 +104,47 @@ const Chat = ({ route, navigation }) => {
     const getChat = async () => {
         const token = await Storage.get('auth_token');
         axios.get('chats/' + chatId, token)
-        .then(response => {
-            if (response.data) {
-                setChat(response.data);
-                setMessages(response.data.messages);
-                axios.put('messages/read/' + chatId + '/' + me._id, {read:true}, token)
-                .then(updated => null)
-                .catch(err => {
-                    console.log(err)
-                })
-            } else {
-                showNotification('Error', response.message);
-            };
-            setLoading(false);
-        })
-        .catch(err => {
-            showNotification('Error', err.message);
-            setLoading(false);
-        }) 
+            .then(response => {
+                if (response.data) {
+                    setChat(response.data);
+                    setMessages(response.data.messages);
+                    axios.put('messages/read/' + chatId + '/' + me._id, { read: true }, token)
+                        .then(updated => null)
+                        .catch(err => {
+                            console.log(err)
+                        })
+                } else {
+                    showNotification('Error', response.message);
+                };
+                setLoading(false);
+            })
+            .catch(err => {
+                showNotification('Error', err.message);
+                setLoading(false);
+            })
     };
 
-    return(
+    return (
         <>
-        <Loading visible={loading}></Loading>
-        {
-            !loading && chat && me ?
-            <>
-                <View style={{paddingHorizontal:20, paddingBottom:50, height:'100%'}}>
-                    <ScrollView vertical showsVerticalScrollIndicator={false} ref={scrollViewRef} style={{paddingTop:20}}>
-                        {
-                            messages.map((m,i) => {
-                                const time = new Date(m.createdAt).getHours() + ":" + new Date(m.createdAt).getMinutes();
-                                return(
-                                    <MessageBubble key={i} isMyMessage={m['senderId'] == me._id} time={time} message={m.message}></MessageBubble>
-                                )
-                            })
-                        }
-                    </ScrollView>
-                </View>
-                <MessageInput onSubmit={handleMessageSubmit}></MessageInput>
-            </> : null
-        }
+            <Loading visible={loading}></Loading>
+            {
+                !loading && chat && me ?
+                    <>
+                        <View style={{ paddingHorizontal: 20, paddingBottom: 50, height: '100%' }}>
+                            <ScrollView vertical showsVerticalScrollIndicator={false} ref={scrollViewRef} style={{ paddingTop: 20 }}>
+                                {
+                                    messages.map((m, i) => {
+                                        const time = new Date(m.createdAt).getHours() + ":" + new Date(m.createdAt).getMinutes();
+                                        return (
+                                            <MessageBubble key={i} isMyMessage={m['senderId'] == me._id} time={time} message={m.message}></MessageBubble>
+                                        )
+                                    })
+                                }
+                            </ScrollView>
+                        </View>
+                        <MessageInput onSubmit={handleMessageSubmit}></MessageInput>
+                    </> : null
+            }
         </>
     );
 };

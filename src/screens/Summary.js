@@ -39,6 +39,7 @@ const Summary = ({ route, navigation }) => {
   const [summary, setSummary] = useState(null);
   const [summaryMatch, setSummaryMatch] = useState(null);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [isPayed, setIsPayed] = useState(false);
   const [isCancelled, setIsCancelled] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [preference, setPreference] = useState(null);
@@ -62,6 +63,7 @@ const Summary = ({ route, navigation }) => {
               setSummary(response2.data);
               setIsCancelled(response.data.cancelled);
               setIsConfirmed(response.data.accepted);
+              setIsPayed(response.data.payed);
               setUser(JSON.parse(u));
               setLoading(false);
               if (response.data.cancelled) {
@@ -76,6 +78,7 @@ const Summary = ({ route, navigation }) => {
                   .get('preferences/' + response.data.preferenceId, token)
                   .then(response3 => {
                     setPreference(response3.data);
+                    getPaymentData(response3.data._id);
                   })
                   .catch(err => {
                     showNotification('Preference error', err.message);
@@ -220,7 +223,11 @@ const Summary = ({ route, navigation }) => {
 
       // Token
       const token = await Storage.get('auth_token');
-      getData();
+      if (matchId) {
+        getData();
+      } else {
+        navigation.navigate('Error', { description: 'Match ID no definido.' });
+      }
 
       const positionHandler = (cb1, cb2) => {
         Geolocation.getCurrentPosition(cb1, cb2);
@@ -270,21 +277,23 @@ const Summary = ({ route, navigation }) => {
     getLocation();
   }, []);
 
-  const getPaymentData = () => {
-    axios.get('payments?preferenceId=' + preference._id)
-    .then(response => {
-      if (response.data && response.data.length) {
-        setPayment(response.data[0]);
-      }
-    });
+  const getPaymentData = (preferenceId) => {
+    console.log('Getting payment data ', preferenceId)
+    axios.get('payments?preferenceId=' + preferenceId)
+      .then(response => {
+        if (response.data && response.data.length) {
+          console.log('Get payment data ', response.data[0]);
+          setPayment(response.data[0]);
+        }
+      });
   };
 
   useFocusEffect(
     React.useCallback(() => {
-      if (preference) {
-        getPaymentData();
+      if (preference && matchId) {
+        getData();
       }
-    })
+    }, [])
   );
 
   const initNavegation = () => {
@@ -441,9 +450,14 @@ const Summary = ({ route, navigation }) => {
                     </Text>
                   </TouchableOpacity>
                   <Table
-                    rows={summary}
+                    rows={{
+                      Dirección: summary.location,
+                      Horario: new Date(summaryMatch.createdAt).toLocaleString(),
+                      Importe: summary.currency + ' ' + summary.price,
+                      'Medio de Pago': summaryMatch.paymentMethod
+                    }}
                     type="obj"
-                    showRows={open ? null : 3}></Table>
+                    showRows={open ? null : 1}></Table>
                 </View>
               </View>
 
@@ -510,7 +524,7 @@ const Summary = ({ route, navigation }) => {
                     color="primary"
                     title="INICIAR NAVEGACIÓN"
                     onPress={initNavegation}></Button>
-                  {!isFinished && (
+                  {!isFinished && !isPayed && (
                     <Button
                       color="complementary"
                       title="CANCELAR ENCUENTRO"
@@ -523,9 +537,6 @@ const Summary = ({ route, navigation }) => {
                   color="complementary"
                   title="VOLVER"
                   onPress={() => navigation.navigate('Home')}></Button>
-              ) : null}
-              {preference && !isConfirmed ? (
-                <CheckoutPro preference={preference}></CheckoutPro>
               ) : null}
             </View>
           </ScrollView>

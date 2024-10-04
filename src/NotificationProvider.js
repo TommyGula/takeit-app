@@ -22,14 +22,15 @@ export const NotificationProvider = ({ children, screen, initialMessage }) => {
     if (initialMessage) showNotification('Message', initialMessage, null, 'alert');
   }, [initialMessage]);
 
-  const showNotification = (title, message, duration=3000, type = 'snackbar', callback = null, buttons = null, cancelable = true, onDismiss = () => null, routes) => {
+  const showNotification = (title, message, duration = 3000, type = 'snackbar', callback = null, buttons = null, cancelable = true, onDismiss = () => null, routes) => {
+    console.log('Screen current ', screenRef.current, routes)
     if (routes && routes.take && !routes.take.includes(screenRef.current)) {
       return;
     };
     if (routes && routes.skip && routes.skip.includes(screenRef.current)) {
       return;
     };
-    
+
     setNotification({ title, message, duration });
 
     switch (type) {
@@ -56,16 +57,19 @@ export const NotificationProvider = ({ children, screen, initialMessage }) => {
             channelId: key, // (required)
             channelName: title,
             channelDescription: message,
-            importance: 4, 
-              vibrate: true, 
+            importance: 4,
+            vibrate: true,
           },
           (created) => console.log(`createChannel returned '${created}'`)
         );
-        PushNotification.localNotification({
-          channelId: key,
-          title: title,
-          message: message,
-        })
+        PushNotification.localNotification(
+          {
+            channelId: key,
+            title: title,
+            message: message,
+          },
+          (created) => console.log(`localNotification returned '${created}'`)
+        );
         break;
       default:
         console.log(`Sorry, we are out of ${type}.`);
@@ -85,7 +89,7 @@ export const NotificationProvider = ({ children, screen, initialMessage }) => {
     if (!socketOn) {
       initNotificationSocket();
     };
-  },[socketOn]);
+  }, [socketOn]);
 
   const initNotificationSocket = async () => {
     const token = await Storage.get('auth_token');
@@ -96,42 +100,43 @@ export const NotificationProvider = ({ children, screen, initialMessage }) => {
       const receiveNewMessage = async (id) => {
         const message = await axios.get('messages/' + id + '?populate=senderId', token);
         if (message) {
-          showNotification(message.data.senderId.firstName + ' ' + message.data.senderId.lastName,  message.data.message, null, 'notification', null, null, null, null, {skip:['Chat']});
+          showNotification(message.data.senderId.firstName + ' ' + message.data.senderId.lastName, message.data.message, null, 'notification', null, null, null, null, { skip: ['Chat'] });
         };
       };
       const getNewMatch = async (newMatchId) => {
         const token = await Storage.get('auth_token');
         axios.get('matches/' + newMatchId, token)
-        .then(response => {
-          showNotification('Nueva solicitud', response.data.buyerId.firstName + ' está solicitando tu lugar. Ingresa aquí para aceptar o rechazar su solicitud', null, 'notification', null, null, null, null, routes={skip:['LivePlace', 'Summary']});
-        })
-        .catch(err => {
+          .then(response => {
+            showNotification('Nueva solicitud', response.data.buyerId.firstName + ' está solicitando tu lugar. Ingresa aquí para aceptar o rechazar su solicitud', null, 'notification', null, null, null, null, routes = { skip: ['LivePlace', 'Summary'] });
+          })
+          .catch(err => {
             console.log(err)
-        })
+          })
       };
       const cancelMatch = async (matchId) => {
         const token = await Storage.get('auth_token');
         axios.get('matches/' + matchId, token)
-        .then(response => {
-          showNotification('Solicitud cancelada', response.data.buyerId.firstName + ' ha cancelado su solicitud', null, 'notification', null, null, null, null, routes={skip:['LivePlace', 'Summary']});
-        })
-        .catch(err => {
+          .then(response => {
+            showNotification('Solicitud cancelada', response.data.buyerId.firstName + ' ha cancelado su solicitud', null, 'notification', null, null, null, null, routes = { skip: ['LivePlace', 'Summary'] });
+          })
+          .catch(err => {
             console.log(err)
-        })
+          })
       };
       const handleFinishMatch = async (matchId) => {
         const token = await Storage.get('auth_token');
         axios.get('matches/' + matchId, token)
-        .then(response => {
-          const myMatch = response.data;
-          showNotification('¡El usuario llegó a destino!', 'Confirmanos si recibiste tus ' + myMatch.currency + ' ' + myMatch.price + ' antes de ceder tu lugar.', null, 'notification', null, null, null, null, routes={skip:['LivePlace', 'Summary']});
-        })
-        .catch(err => {
+          .then(response => {
+            const myMatch = response.data;
+            showNotification('¡El usuario llegó a destino!', 'Confirmanos si recibiste tus ' + myMatch.currency + ' ' + myMatch.price + ' antes de ceder tu lugar.', null, 'notification', null, null, null, null, routes = { skip: ['LivePlace', 'Summary'] });
+          })
+          .catch(err => {
             console.log(err)
-        })
+          })
       }
 
       // Chat
+      console.log('Socket for message: ' + 'receivedMessage_' + JSON.parse(user)._id + ' ' + JSON.parse(user).firstName)
       socket.on('receivedMessage_' + JSON.parse(user)._id, receiveNewMessage);
       // LivePlace & Summary
       socket.on('newMatch_' + JSON.parse(user)._id, getNewMatch);
