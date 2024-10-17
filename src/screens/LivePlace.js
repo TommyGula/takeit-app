@@ -75,7 +75,7 @@ const LivePlace = ({ navigation, route }) => {
         React.useCallback(() => {
             const getMatches = async () => {
                 const token = await Storage.get('auth_token');
-                axios.get('matches?parkingId=' + parkingId, token)
+                axios.get('matches?cancelled=false&parkingId=' + parkingId, token)
                     .then(response => {
                         setMatched(response.data);
                     })
@@ -92,7 +92,10 @@ const LivePlace = ({ navigation, route }) => {
             const token = await Storage.get('auth_token');
             axios.get('matches/' + newMatchId, token)
                 .then(response => {
-                    setMatched(prevMatches => [...prevMatches, response.data]);
+                    const existing = matched.includes(response.data);
+                    if (!existing) {
+                        setMatched(prevMatches => [...prevMatches, response.data]);
+                    };
                 })
                 .catch(err => {
                     console.log(err)
@@ -1398,16 +1401,18 @@ const LivePlace = ({ navigation, route }) => {
                                     </View> :
                                     <View >
                                         <Text style={[styles.text, { textAlign: 'center', marginTop: 20, marginBottom: 20 }]}>{`¡Tienes ${matched.length > 1 ? 'una ' : matched.length + ' '}coincidencia${matched.length > 1 ? 's' : ''}!`}</Text>
-                                        <ScrollViewContainer selected={selected}>
-                                            {matched.map((match, i) => { // nearByUsers will be the fetched data of type "match"
-                                                //match['location'] = match['carName'];
-                                                match['userId'] = match['buyerId'];
-                                                return (
-                                                    // The card will show the price, the user picture and pictures if there are
-                                                    <ListView leftButtonLabel={'Aceptar'} pre='$ ' leftButtonAction={handleAccept} style={{ paddingHorizontal: 20 }} key={i} item={match} active={selected && selected._id == match._id} navigation={navigation} onPress={(pos) => setSelected({ ...match, ...pos })} />
-                                                )
-                                            })}
-                                        </ScrollViewContainer>
+                                        <View style={styles.section}>
+                                            <View style={styles.scrollViewContainer}>
+                                                {matched.map((match, i) => { // nearByUsers will be the fetched data of type "match"
+                                                    //match['location'] = match['carName'];
+                                                    match['userId'] = match['buyerId'];
+                                                    return (
+                                                        // The card will show the price, the user picture and pictures if there are
+                                                        <ListView leftButtonLabel={'Aceptar'} pre='$ ' leftButtonAction={handleAccept} style={{ paddingHorizontal: 20 }} key={i} item={match} active={selected && selected._id == match._id} navigation={navigation} onPress={(pos) => setSelected({ ...match, ...pos })} />
+                                                    )
+                                                })}
+                                            </View>
+                                        </View>
                                     </View>
                             }
                         </> :

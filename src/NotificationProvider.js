@@ -51,7 +51,7 @@ export const NotificationProvider = ({ children, screen, initialMessage }) => {
         );
         break;
       case 'notification':
-        const key = Date.now().toString(); // Key must be unique everytime
+        const key = Math.floor(Math.random() * 100000).toString(); // Key must be unique everytime
         PushNotification.createChannel(
           {
             channelId: key, // (required)
@@ -60,7 +60,7 @@ export const NotificationProvider = ({ children, screen, initialMessage }) => {
             importance: 4,
             vibrate: true,
           },
-          (created) => console.log(`createChannel returned '${created}'`)
+          (created) => console.log(`createChannel returned '${created}' key ${key}`)
         );
         PushNotification.localNotification(
           {

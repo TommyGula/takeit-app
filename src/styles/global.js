@@ -60,14 +60,6 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'visible',
     width: '100%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -2, // Negative value for vertical offset to show shadow at the top
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 5, // Elevation for Android shadows
   },
   scrollViewContainer: {
     backgroundColor: '#fff',
@@ -75,6 +67,7 @@ export const styles = StyleSheet.create({
     borderTopRightRadius: 10,
     overflow: 'scroll',
     position: 'relative',
+    height: '100vh'
   },
   scrollView: {
     display: 'grid',

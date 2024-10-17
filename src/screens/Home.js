@@ -195,7 +195,6 @@ const Home = ({ navigation }) => {
                       // The card will show the price, the user picture and pictures if there are
                       <ListView style={{ paddingHorizontal: 20 }} key={i} item={parking} pre='$ ' active={selected && selected._id == parking._id} navigation={navigation} onPress={(pos) => {
                         const selection = { ...parking, ...pos };
-                        console.log('Selection ', selected && selected._id, parking._id)
                         setSelected(selected && selected._id == parking._id ? null : selection);
                       }} />
                     )

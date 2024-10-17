@@ -86,12 +86,20 @@ const Summary = ({ route, navigation }) => {
               }
             })
             .catch(err => {
-              showNotification('Error', err.message);
+              navigation.navigate('Home');
+              showNotification(
+                'Error',
+                'Lo sentimos. El encuentro ya fue cancelado',
+              );
             });
         }
       })
       .catch(err => {
-        showNotification('Error', err.message);
+        navigation.navigate('Home');
+        showNotification(
+          'Error',
+          'Lo sentimos. El encuentro ya fue cancelado',
+        );
       });
   };
 
@@ -190,13 +198,13 @@ const Summary = ({ route, navigation }) => {
       socket.on('cancelledMatch_' + user._id, handleCancelMatch);
       socket.on('cancelledMatchError_' + user._id, handleCancelMatchError);
       socket.on('takenMatch_' + user._id, handleTakenMatch); // A new match is saved in database
-      socket.on('deletePlace_' + user._id, handleDeletedPlace);
+      socket.on('deletePlace_' + summary._id, handleDeletedPlace);
       socket.on('matchFinished_' + user._id, handleFinishMatch);
       return () => {
         socket.off('cancelledMatch_' + user._id, handleCancelMatch);
         socket.off('cancelledMatchError_' + user._id, handleCancelMatchError);
         socket.off('takenMatch_' + user._id, handleTakenMatch);
-        socket.off('deletePlace_' + user._id, handleDeletedPlace);
+        socket.off('deletePlace_' + summary._id, handleDeletedPlace);
         socket.off('matchFinished_' + user._id, handleFinishMatch);
       };
     }
@@ -312,7 +320,7 @@ const Summary = ({ route, navigation }) => {
   };
 
   const cancelEverything = () => {
-    if (!preference) {
+    if (!isPayed) {
       showNotification(
         'Confirmar',
         '¿Seguro que quieres cancelar el encuentro? No se te cargarán costos adicionales',
@@ -460,12 +468,19 @@ const Summary = ({ route, navigation }) => {
                     showRows={open ? null : 1}></Table>
                 </View>
               </View>
+              {
+                !isCancelled && !isFinished && !isPayed ?
+                  <Button
+                    color="complementary"
+                    title="CANCELAR"
+                    onPress={cancelEverything}></Button> : null
+              }
 
               {isConfirmed ? (
                 <>
                   {/* Go to chat or to profile */}
                   {preference && isConfirmed ? (
-                    <CheckoutPro preference={preference} payment={payment}></CheckoutPro>
+                    <CheckoutPro preference={preference} payment={payment} showNotification={showNotification}></CheckoutPro>
                   ) : null}
                   <View
                     style={{
@@ -524,12 +539,6 @@ const Summary = ({ route, navigation }) => {
                     color="primary"
                     title="INICIAR NAVEGACIÓN"
                     onPress={initNavegation}></Button>
-                  {!isFinished && !isPayed && (
-                    <Button
-                      color="complementary"
-                      title="CANCELAR ENCUENTRO"
-                      onPress={cancelEverything}></Button>
-                  )}
                 </>
               ) : null}
               {isCancelled ? (

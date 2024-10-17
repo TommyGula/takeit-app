@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, ImageBackground } from "react-native";
 import { prettyPrice } from "../utils/helpers";
 import { styles, colors } from "../styles/global";
-import MPIcon from '../../assets/icons/mp.png';
 import { requestLocationPermission } from '../services/ClientPermission';
 import Geolocation from 'react-native-geolocation-service';
 import Button from "../components/Button";
@@ -11,7 +10,7 @@ import { RadioButton } from 'react-native-paper';
 import { useNotification } from "../NotificationProvider";
 import axios from '../utils/axios';
 import Payment from "../components/Payment";
-import Dropdown from "../components/Dropdown";
+import Geocoder from '../utils/geocoder';
 import ModalComponent from "../components/Modal";
 import CarouselComponent from "../components/Carousel";
 import Loading from "./Loading";
@@ -102,25 +101,30 @@ const Selection = ({ navigation, route }) => {
             // Get user's current location
             Geolocation.getCurrentPosition(
                 ({ coords }) => {
-                    axios.post('matches', {
-                        sellerId: item.userId,
-                        buyerId: currUser._id,
-                        parkingId: item._id,
-                        price: item.price,
-                        currency: item.currency,
-                        paymentMethod: method,
-                        latitude: coords.latitude,
-                        longitude: coords.longitude
-                    }, token)
-                        .then(response => {
-                            console.log(JSON.stringify(response.data));
-                            navigation.navigate('Summary', { matchId: response.data._id });
-                        })
-                        .catch(err => {
-                            showNotification('Error', err.message, null, 'alert', () => {
-                                navigation.navigate('Home');
-                            });
-                        })
+                    Geocoder.from(coords)
+                        .then(json => {
+                            var location = json.results[0].formatted_address;
+                            axios.post('matches', {
+                                sellerId: item.userId,
+                                buyerId: currUser._id,
+                                parkingId: item._id,
+                                price: item.price,
+                                currency: item.currency,
+                                paymentMethod: method,
+                                location: location,
+                                latitude: coords.latitude,
+                                longitude: coords.longitude
+                            }, token)
+                                .then(response => {
+                                    console.log(JSON.stringify(response.data));
+                                    navigation.navigate('Summary', { matchId: response.data._id });
+                                })
+                                .catch(err => {
+                                    showNotification('Error', err.message, null, 'alert', () => {
+                                        navigation.navigate('Home');
+                                    });
+                                })
+                        });
                 },
                 (error) => console.error(error),
                 { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
