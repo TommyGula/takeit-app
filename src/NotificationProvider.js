@@ -1,18 +1,37 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import PushNotification from 'react-native-push-notification'
 import Snackbar from 'react-native-snackbar';
 import socket from './services/SocketIO';
 import Storage from './services/Storage';
 import axios from './utils/axios';
+import { useNavigation } from '@react-navigation/native';
 
 const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children, screen, initialMessage }) => {
+  const navigation = useNavigation();
   const [notification, setNotification] = useState(null);
   const [socketOn, setSocketOn] = useState(false);
 
   const screenRef = useRef(screen);
+
+  useEffect(() => {
+    PushNotification.configure({
+      onNotification: function (received) {
+        if (received.userInteraction && received.onAccept) {
+          received.onAccept();
+        };
+
+        notification.finish(PushNotification.FetchResult.NoData);
+      },
+      requestPermissions: Platform.OS === 'ios',
+      onRegister: function (token) {
+        console.log('Token:', token);
+        // handle registration token here
+      },
+    });
+  });
 
   useEffect(() => {
     screenRef.current = screen;
@@ -67,6 +86,7 @@ export const NotificationProvider = ({ children, screen, initialMessage }) => {
             channelId: key,
             title: title,
             message: message,
+            onAccept: callback ? callback : null
           },
           (created) => console.log(`localNotification returned '${created}'`)
         );
@@ -98,9 +118,11 @@ export const NotificationProvider = ({ children, screen, initialMessage }) => {
       setSocketOn(true);
 
       const receiveNewMessage = async (id) => {
-        const message = await axios.get('messages/' + id + '?populate=senderId', token);
+        const message = await axios.get('messages/' + id + '?populate=senderId&populate=chatId', token);
         if (message) {
-          showNotification(message.data.senderId.firstName + ' ' + message.data.senderId.lastName, message.data.message, null, 'notification', null, null, null, null, { skip: ['Chat'] });
+          showNotification(message.data.senderId.firstName + ' ' + message.data.senderId.lastName, message.data.message, null, 'notification', () => {
+            navigation.navigate('Chat', { userName: message.data.chatId.titles[message.data.senderId._id], chatId: message.data.chatId._id });
+          }, null, null, null, { skip: ['Chat'] });
         };
       };
       const getNewMatch = async (newMatchId) => {
