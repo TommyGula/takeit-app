@@ -13,17 +13,21 @@ export const NotificationProvider = ({ children, screen, initialMessage }) => {
   const navigation = useNavigation();
   const [notification, setNotification] = useState(null);
   const [socketOn, setSocketOn] = useState(false);
+  const [onAcceptCallback, setOnAcceptCallback] = useState(null);
 
   const screenRef = useRef(screen);
 
   useEffect(() => {
     PushNotification.configure({
       onNotification: function (received) {
-        if (received.userInteraction && received.onAccept) {
-          received.onAccept();
+        console.log('On accept exec ', received)
+        if (received.userInteraction && onAcceptCallback) {
+          onAcceptCallback();
         };
 
-        notification.finish(PushNotification.FetchResult.NoData);
+        if (PushNotification.FetchResult) {
+          notification.finish(PushNotification.FetchResult.NoData);
+        };
       },
       requestPermissions: Platform.OS === 'ios',
       onRegister: function (token) {
@@ -42,7 +46,6 @@ export const NotificationProvider = ({ children, screen, initialMessage }) => {
   }, [initialMessage]);
 
   const showNotification = (title, message, duration = 3000, type = 'snackbar', callback = null, buttons = null, cancelable = true, onDismiss = () => null, routes) => {
-    console.log('Screen current ', screenRef.current, routes)
     if (routes && routes.take && !routes.take.includes(screenRef.current)) {
       return;
     };
@@ -70,6 +73,7 @@ export const NotificationProvider = ({ children, screen, initialMessage }) => {
         );
         break;
       case 'notification':
+        console.log('Notification ', callback)
         const key = Math.floor(Math.random() * 100000).toString(); // Key must be unique everytime
         PushNotification.createChannel(
           {
@@ -81,12 +85,12 @@ export const NotificationProvider = ({ children, screen, initialMessage }) => {
           },
           (created) => console.log(`createChannel returned '${created}' key ${key}`)
         );
+        setOnAcceptCallback(() => callback);
         PushNotification.localNotification(
           {
             channelId: key,
             title: title,
             message: message,
-            onAccept: callback ? callback : null
           },
           (created) => console.log(`localNotification returned '${created}'`)
         );

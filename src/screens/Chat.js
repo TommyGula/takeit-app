@@ -62,11 +62,14 @@ const Chat = ({ route, navigation }) => {
     useEffect(() => {
         if (me) {
             getChat();
-            scrollToBottom();
         } else {
             getUser();
         };
     }, [me]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [me, chat, loading]);
 
     useEffect(() => {
         const getNewMessage = async (newMessageId) => {
@@ -131,15 +134,17 @@ const Chat = ({ route, navigation }) => {
                 !loading && chat && me ?
                     <>
                         <View style={{ paddingHorizontal: 20, paddingBottom: 50, height: '100%' }}>
-                            <ScrollView vertical showsVerticalScrollIndicator={false} ref={scrollViewRef} style={{ paddingTop: 20 }}>
-                                {
-                                    messages.map((m, i) => {
-                                        const time = new Date(m.createdAt).getHours() + ":" + new Date(m.createdAt).getMinutes();
-                                        return (
-                                            <MessageBubble key={i} isMyMessage={m['senderId'] == me._id} time={time} message={m.message}></MessageBubble>
-                                        )
-                                    })
-                                }
+                            <ScrollView vertical showsVerticalScrollIndicator={false} ref={scrollViewRef} style={{}}>
+                                <View style={{ paddingVertical: 20 }}>
+                                    {
+                                        messages.map((m, i) => {
+                                            const time = new Date(m.createdAt).getHours() + ":" + new Date(m.createdAt).getMinutes();
+                                            return (
+                                                <MessageBubble key={i} isMyMessage={m['senderId'] == me._id} time={time} message={m.message}></MessageBubble>
+                                            )
+                                        })
+                                    }
+                                </View>
                             </ScrollView>
                         </View>
                         <MessageInput onSubmit={handleMessageSubmit}></MessageInput>
