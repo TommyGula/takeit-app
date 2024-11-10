@@ -1404,7 +1404,7 @@ const LivePlace = ({ navigation, route }) => {
                                         <View style={styles.section}>
                                             <View style={styles.scrollViewContainer}>
                                                 {matched.map((match, i) => { // nearByUsers will be the fetched data of type "match"
-                                                    //match['location'] = match['carName'];
+                                                
                                                     match['userId'] = match['buyerId'];
                                                     return (
                                                         // The card will show the price, the user picture and pictures if there are
@@ -1423,7 +1423,6 @@ const LivePlace = ({ navigation, route }) => {
                             <View style={styles.section}>
                                 <View style={styles.scrollViewContainer}>
                                     {matched.map((match, i) => { // nearByUsers will be the fetched data of type "match"
-                                        //match['location'] = match['carName'];
                                         match['userId'] = match['buyerId']
                                         return (
                                             // The card will show the price, the user picture and pictures if there are
