@@ -3,17 +3,21 @@
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission android:name="android.permission.VIBRATE" />
 
   <application android:name=".MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:allowBackup="false" android:theme="@style/AppTheme">
+
+    <!-- Push Notification Metadata and Receivers -->
     <meta-data android:name="com.dieam.reactnativepushnotification.notification_foreground" android:value="true" />
     <meta-data android:name="com.dieam.reactnativepushnotification.channel_create_default" android:value="true" />
     <meta-data android:name="com.dieam.reactnativepushnotification.notification_color" android:resource="@color/white" />
+
+    <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationActions" android:exported="true" />
+
     <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationPublisher" android:exported="true" />
-    <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationActions" android:exported="true">
-        <intent-filter>
-            <action android:name="com.yourpackagename.NOTIFICATION_OPENED" />
-        </intent-filter>
-    </receiver>
+
+    <!-- Intent Filter placed inside a receiver -->
     <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationBootEventReceiver" android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -22,16 +26,24 @@
       </intent-filter>
     </receiver>
 
+    <!-- Service for Firebase Messaging -->
     <service android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationListenerService" android:exported="false">
       <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT" />
       </intent-filter>
     </service>
+
     <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCYMeIWU7pSQbh8C_Hc7ZMRXPqQyduVP8s"/>
+
+    <!-- Main Activity with Deep Link and Intent Filters -->
     <activity android:name=".MainActivity" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode" android:launchMode="singleTask" android:windowSoftInputMode="adjustResize" android:exported="true">
+
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+
+      <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
@@ -40,10 +52,13 @@
       </intent-filter>
     </activity>
 
+    <!-- Firebase Messaging Service -->
     <service android:name=".java.MyFirebaseMessagingService" android:exported="false">
       <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT" />
       </intent-filter>
     </service>
+
   </application>
+
 </manifest>
