@@ -94,10 +94,10 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            storeFile file("busy-town.jks")
+            storePassword 'Nationale.33'
+            keyAlias 'busy-town'
+            keyPassword 'Nationale.33'
         }
         release {
             storeFile file("busy-town.jks")
