@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "946588535618",
     "project_id": "busy-town",
-    "storage_bucket": "busy-town.appspot.com"
+    "storage_bucket": "busy-town.firebasestorage.app"
   },
   "client": [
     {
@@ -12,7 +12,28 @@
           "package_name": "com.busytownapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "946588535618-1am5tommnfpvooj8vu3ds4ubb64virdp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.busytownapp",
+            "certificate_hash": "ef6c4898ba910fe7d10b9b03468e37ebdae097ff"
+          }
+        },
+        {
+          "client_id": "946588535618-d4qp64e9vm5dn8t928qgbreld3fah0j7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.busytownapp",
+            "certificate_hash": "ec763c654a418c1a520f167d39aa506c3a0a5324"
+          }
+        },
+        {
+          "client_id": "946588535618-3jvg0psfcqv9muqni1e9k53d093n5t29.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAa6yZ6WzD94LZ9yVLzgnr8BjIxi1u38KU"
@@ -20,7 +41,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "946588535618-3jvg0psfcqv9muqni1e9k53d093n5t29.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

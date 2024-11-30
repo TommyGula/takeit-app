@@ -76,3 +76,7 @@ Al cargar, espera por el socket matchTaken. Si el usuario que envía en el param
 - [X] Modificar utils/mercadopago.js y crear una api que traiga los medios de pago SEGUN EL USUARIO en lugar de llamar directamente a la api de MP
 - [X] Cambiar todos los scrollViewContainer por un componente que tenga un onLayout y cambie de altura dependiendo de la altura de su child
 - [] Hacer que cuando se recive un mensaje nuevo solo lo marque como read: true si el que lo leé es el recipiente, no el remitente.
+- [] Hacer funcionar el Google Login. En Google Cloud, Firebase y el proyecto deben coincidir el package name y la sha-1 key fingerprint. Ahora mismo estoy utilizando la sha-1 key que sale de correr ./gradlew signingReport in root of /android folder. El comando para las otras es:
+* keytool -list -v -keystore android\app\debug.keystore -alias androiddebugkey
+* keytool -list -v -keystore android\app\busy-town.jks -alias busy-town
+* También están las claves que saltan acá: https://play.google.com/console/u/0/developers/5707683580275953640/app/4973825845596711660/keymanagement. No tengo ni idea cuál de todas tiene que ir. Solo se que pruebe la que pruebe obtengo error
