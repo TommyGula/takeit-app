@@ -79,7 +79,7 @@ const Login = ({ route }) => {
         <Divider></Divider>
         {/* Google Login */}
         <View style={{ marginBottom: 20, display: 'grid', gap: 10 }}>
-          <GoogleAuth text={'Iniciar con Google'}></GoogleAuth>
+          <GoogleAuth route={route} text={'Iniciar con Google'}></GoogleAuth>
         </View>
         <Divider></Divider>
         {/* Registro */}

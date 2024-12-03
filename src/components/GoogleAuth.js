@@ -5,8 +5,10 @@ import {
 } from '@react-native-google-signin/google-signin';
 import Config from 'react-native-config';
 import auth from '@react-native-firebase/auth';
+import axios from './utils/axios';
+import Storage from '../services/Storage';
 
-export default function GoogleAuth({ text }) {
+export default function GoogleAuth({ text, route }) {
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -23,13 +25,42 @@ export default function GoogleAuth({ text }) {
     if (!idToken) {
       throw new Error('No ID token found');
     }
+    signInWithGoogleToken(signInResult);
 
     const googleCredential = auth.GoogleAuthProvider.credential(signInResult.data.token);
     return auth().signInWithCredential(googleCredential);
   };
 
-  const signInWithGoogleToken = async () => {
+  const signInWithGoogleToken = async (res) => {
+    axios.get('users/' + res.Ca, res.idToken, async user => {
+      if (!user) {
+        axios.post(
+          'users/',
+          null,
+          {
+            firstName: res.profileObj.givenName,
+            lastName: res.profileObj.familyName,
+            googleId: res.Ca,
+            document: res.Ca,
+            email: res.profileObj.email,
+            profileImg: res.profileObj.imageUrl,
+          },
+          async newUser => {
+            await Storage.set('auth_token', res.idToken);
+            await Storage.set('user', JSON.stringify(newUser));
 
+            // Re-check authentication in Navigator
+            route.params.setIsAuth(true);
+          }
+        )
+      } else {
+        await Storage.set('auth_token', res.idToken);
+        await Storage.set('user', JSON.stringify(user));
+
+        // Re-check authentication in Navigator
+        route.params.setIsAuth(true);
+      }
+    })
   };
 
   return (
